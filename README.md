@@ -1,9 +1,9 @@
 # Expense Tracker
 Programming on the Internet 31748 Assignment 1 - Dynamic Web Interface to a Database System  
-Chosen Project: Expense Tracker
+Chosen Project: Expense Tracker  
 
 ## Problem
-<!-- 2 line summary of problem this website solves -->
+<!-- a 2 line summary of problem this website solves -->
 
 ## Tech Stack
 <!-- illustration of technical stack, including frontend, styling, routing, data, and deployment (if applicable) -->
