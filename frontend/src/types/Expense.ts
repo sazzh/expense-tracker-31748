@@ -33,7 +33,7 @@ export const mockData: Expense[] = [
         description: "drink from fav coffee place",
     },
     {
-        expenseId: "003",
+        expenseId: "004",
         date: new Date("2025-09-04T10:00:00"),
         expense: "Coffee",
         amount: 59,
@@ -41,7 +41,7 @@ export const mockData: Expense[] = [
         description: "drink from fav coffee place",
     },
     {
-        expenseId: "004",
+        expenseId: "005",
         date: new Date("2025-08-04T10:00:00"),
         expense: "Coffee",
         amount: 59,
@@ -49,7 +49,7 @@ export const mockData: Expense[] = [
         description: "drink from fav coffee place",
     },
     {
-        expenseId: "005",
+        expenseId: "006",
         date: new Date("2025-07-04T10:00:00"),
         expense: "Coffee",
         amount: 59,
