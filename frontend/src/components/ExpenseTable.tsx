@@ -1,5 +1,6 @@
-import { Table } from "@mantine/core";
+import { ActionIcon, Table } from "@mantine/core";
 import type { Expense } from "../types/Expense";
+import { IconEdit, IconTrash } from '@tabler/icons-react'
 
 type ExpenseTableProps = {
   data: Expense[],
@@ -28,6 +29,16 @@ export default function ExpenseTable(props: ExpenseTableProps) {
             <Table.Td>{(row.amount / 10).toFixed(2)}</Table.Td>
             <Table.Td>{row.category}</Table.Td>
             <Table.Td>{row.description}</Table.Td>
+            <Table.Td>
+              <ActionIcon.Group>
+                <ActionIcon>
+                  <IconEdit />
+                </ActionIcon>
+                <ActionIcon>
+                  <IconTrash />
+                </ActionIcon>
+              </ActionIcon.Group>
+            </Table.Td>
           </Table.Tr>
         )}
       </Table.Tbody>
