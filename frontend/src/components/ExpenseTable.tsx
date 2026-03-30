@@ -1,12 +1,25 @@
 import { ActionIcon, Box, Paper, Table } from "@mantine/core";
 import type { Expense } from "../types/Expense";
 import { IconEdit, IconTrash } from '@tabler/icons-react'
+import { useState } from "react";
 
 type ExpenseTableProps = {
   data: Expense[],
 };
 
 export default function ExpenseTable(props: ExpenseTableProps) {
+  const [expenses, setExpenses] = useState(() => {
+    const saved = localStorage.getItem('expense_storage_key');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const deleteExpense = (id: string) => {
+    const expenseToDel = expenses.find(expense => expense.id === id);
+    if (window.confirm(`Are you sure you want to delete "${expenseToDel.expense}"?`)) {
+      setExpenses(expenses.filter(expense => expense.id !== id));
+    }
+  }
+
   return (
     <Box mx="auto" w="100%" maw="1050" p="sm">
     <Paper shadow="sm" radius="md" withBorder style={{overflow: "hidden"}}>
@@ -33,11 +46,15 @@ export default function ExpenseTable(props: ExpenseTableProps) {
               <Table.Td>{row.description}</Table.Td>
               <Table.Td style={{ width: "9%" }}>
                   <ActionIcon.Group>
-                    <ActionIcon variant="subtle" aria-label="Edit Expense">
-                      <IconEdit stroke={1.25} color="black" />
+                    <ActionIcon variant="subtle" aria-label="Edit Expense"
+                      
+                      >
+                      <IconEdit size={28} stroke={1.25} color="black" />
                     </ActionIcon>
-                    <ActionIcon variant="subtle" aria-label="Delete Expense">
-                      <IconTrash stroke={1.25} color="var(--danger)" />
+                    <ActionIcon variant="subtle" aria-label="Delete Expense"
+                      onClick={() => deleteExpense(row.expenseId)} 
+                      >
+                      <IconTrash size={28} stroke={1.25} color="var(--danger)" />
                     </ActionIcon>
                   </ActionIcon.Group>
               </Table.Td>
