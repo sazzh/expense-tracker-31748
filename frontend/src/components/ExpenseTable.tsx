@@ -1,4 +1,4 @@
-import { ActionIcon, Box, Paper, Table } from "@mantine/core";
+import { ActionIcon, Box, Paper, Table, Title } from "@mantine/core";
 import type { Expense } from "../types/Expense";
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { useState } from "react";
@@ -15,14 +15,17 @@ export default function ExpenseTable(props: ExpenseTableProps) {
 
   const deleteExpense = (id: string) => {
     const expenseToDel = expenses.find(expense => expense.id === id);
-    if (window.confirm(`Are you sure you want to delete "${expenseToDel.expense}"?`)) {
+    const confirmed = window.confirm(`Are you sure you want to delete ${expenseToDel}?`);
+    if (confirmed) {
+      console.log("Delete")
       setExpenses(expenses.filter(expense => expense.id !== id));
     }
   }
 
   return (
     <Box mx="auto" w="100%" maw="1050" p="sm">
-    <Paper shadow="sm" radius="md" withBorder style={{overflow: "hidden"}}>
+    <Title ta="left">Your Expense Logbook</Title>
+    <Paper shadow="sm" radius="md" mt="md" withBorder style={{overflow: "hidden"}}>
       <Table verticalSpacing="xs" highlightOnHover striped stripedColor="primary.0">
         <Table.Thead bg="primary.3">
           <Table.Tr>
