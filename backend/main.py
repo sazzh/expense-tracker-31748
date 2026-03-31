@@ -4,29 +4,30 @@ from litestar import Litestar, get, post
 from sqlalchemy import Date, Enum, Integer, String, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from litestar.plugins.sqlalchemy import SQLAlchemyAsyncConfig, SQLAlchemyPlugin
-from typing import Sequence
+from typing import Optional, Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 
-class Base(DeclarativeBase): ...
+class Base(DeclarativeBase):
+    pass
 
 class Category(enum.Enum):
     FOOD = "food"
     TRANSPORT = "transport"
     UTILITIES = "utilities"
-    SHOPPINH = "shopping"
+    SHOPPING = "shopping"
     ENTERTAINMENT = "entertainment"
     OTHER = "other"
 
 class Expense(Base):
-    __tablename__ = "expense"
+    __tablename__ = "expenses"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     date: Mapped[datetime.date] = mapped_column(Date)
     name: Mapped[str] = mapped_column(String(50))
     amount: Mapped[int] = mapped_column(Integer) # cents
     category: Mapped[Category] = mapped_column(Enum(Category))
-    description: Mapped[str] = mapped_column(String(255))
+    description: Mapped[Optional[str]] = mapped_column(String(255))
 
-@post('/new')
+@post('/expense')
 async def add_expense(data: Expense, db_session: AsyncSession) -> Sequence[Expense]:
     async with db_session.begin():
         db_session.add(data)
