@@ -1,9 +1,11 @@
 import datetime
 import enum
-from litestar import Litestar, get, post
+from litestar import Litestar, delete, get, post, put
+from dataclasses import dataclass
 from sqlalchemy import Date, Enum, Integer, String, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from litestar.plugins.sqlalchemy import SQLAlchemyAsyncConfig, SQLAlchemyPlugin
+from litestar.dto import DTOConfig
+from litestar.plugins.sqlalchemy import SQLAlchemyAsyncConfig, SQLAlchemyPlugin, SQLAlchemyDTO
 from typing import Optional, Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,6 +20,7 @@ class Category(enum.Enum):
     ENTERTAINMENT = "entertainment"
     OTHER = "other"
 
+# SQL Model
 class Expense(Base):
     __tablename__ = "expenses"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -27,11 +30,39 @@ class Expense(Base):
     category: Mapped[Category] = mapped_column(Enum(Category))
     description: Mapped[Optional[str]] = mapped_column(String(255))
 
+# DTOs from model
+class ExpenseRead(SQLAlchemyDTO[Expense]):
+    pass
+
+class ExpenseCreate(SQLAlchemyDTO[Expense]):
+    create_config = DTOConfig(exclude={"id"})
+
+class ExpenseUpdate(SQLAlchemyDTO[Expense]):
+    update_config = DTOConfig(
+        exclude={"id"},
+        partial=True,
+    )
+
+# Routes
+@get('/expense')
+async def list_expenses() -> list[Expense]:
+    ... # TODO
+
+@get('/expense/{expense_id:int}')
+async def get_expense(expense_id: int) -> Expense:
+    ... # TODO
+
 @post('/expense')
-async def add_expense(data: Expense, db_session: AsyncSession) -> Sequence[Expense]:
-    async with db_session.begin():
-        db_session.add(data)
-    return (await db_session.execute(select(Expense))).scalars().all()
+async def create_expense(data: ExpenseCreate) -> Expense:
+    ...
+
+@put('/expense/{expense_id:int}') # might need dataclass with optionals?
+async def update_expense(expense_id: int, data: ExpenseCreate) -> Expense:
+    ...
+
+@delete('/expense/{expense_id:int}')
+async def delete_expense(expense_id: int) -> None:
+    ...
 
 config = SQLAlchemyAsyncConfig(
     connection_string="sqlite+aiosqlite:///expense_tracker.sqlite", create_all=True, metadata=Base.metadata
@@ -39,6 +70,6 @@ config = SQLAlchemyAsyncConfig(
 
 plugin = SQLAlchemyPlugin(config=config)
 app = Litestar(
-    route_handlers=[add_expense],
+    route_handlers=[list_expenses, get_expense, create_expense, update_expense, delete_expense],
     plugins=[plugin]
 )
