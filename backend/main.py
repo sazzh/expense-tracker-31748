@@ -62,9 +62,10 @@ class ExpenseController(Controller):
     async def create_expense(self, data: Expense, expense_repo: ExpenseRepository) -> Expense:
         return await expense_repo.add(data, auto_commit=True)
 
-    @put('/{expense_id:int}')
-    async def update_expense(self, expense_id: int, data: ExpenseCreate, expense_repo: ExpenseRepository) -> Expense:
-        ...
+    @put('/{expense_id:int}', dto=ExpenseUpdate, return_dto=ExpenseRead)
+    async def update_expense(self, expense_id: int, data: Expense, expense_repo: ExpenseRepository) -> Expense:
+        data.id = expense_id
+        return await expense_repo.update(data, auto_commit=True)
 
     @delete('/{expense_id:int}')
     async def delete_expense(self, expense_id: int, expense_repo: ExpenseRepository) -> None:
