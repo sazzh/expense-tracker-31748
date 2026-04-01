@@ -54,16 +54,16 @@ class ExpenseController(Controller):
     async def list_expenses(self, expense_repo: ExpenseRepository) -> list[Expense]:
         return await expense_repo.list()
 
-    @get('/{expense_id:int}')
-    async def get_expense(self, expense_id: int, expense_repo: ExpenseRepository) -> ExpenseRead:
-        ... # TODO
+    @get('/{expense_id:int}', return_dto=ExpenseRead)
+    async def get_expense(self, expense_id: int, expense_repo: ExpenseRepository) -> Expense:
+        return await expense_repo.get(expense_id)
 
     @post('/', dto=ExpenseCreate, return_dto=ExpenseRead)
     async def create_expense(self, data: Expense, expense_repo: ExpenseRepository) -> Expense:
         return await expense_repo.add(data, auto_commit=True)
 
     @put('/{expense_id:int}')
-    async def update_expense(self, expense_id: int, data: ExpenseCreate, expense_repo: ExpenseRepository) -> ExpenseRead:
+    async def update_expense(self, expense_id: int, data: ExpenseCreate, expense_repo: ExpenseRepository) -> Expense:
         ...
 
     @delete('/{expense_id:int}')
