@@ -6,6 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from litestar.plugins.sqlalchemy import SQLAlchemyAsyncConfig, SQLAlchemyPlugin, SQLAlchemyDTO, SQLAlchemyDTOConfig, repository
 from litestar.contrib.sqlalchemy.base import BigIntBase as Base
 from litestar.di import Provide
+from litestar.exceptions import NotFoundException
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -69,7 +70,10 @@ class ExpenseController(Controller):
 
     @delete('/{expense_id:int}')
     async def delete_expense(self, expense_id: int, expense_repo: ExpenseRepository) -> None:
-        ...
+        expense = await expense_repo.get(expense_id)
+        if not expense:
+            raise NotFoundException("Expense not found")
+        await expense_repo.delete(expense_id, auto_commit=True)
 
 config = SQLAlchemyAsyncConfig(
     connection_string="sqlite+aiosqlite:///expense_tracker.sqlite", create_all=True, metadata=Base.metadata
