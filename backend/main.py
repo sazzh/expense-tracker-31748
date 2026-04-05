@@ -1,18 +1,13 @@
 from collections.abc import AsyncGenerator
-from contextlib import asynccontextmanager
 import datetime
 from enum import Enum
-from typing import Optional, Annotated
+from typing import Optional
 from litestar import Litestar, delete, get, post, put
-from litestar.dto import dto_field
-from litestar.plugins.sqlalchemy import SQLAlchemyPlugin, SQLAlchemyAsyncConfig
-from dataclasses import dataclass
-from sqlalchemy.orm import Mapped, registry, mapped_column
+from litestar.plugins.sqlalchemy import SQLAlchemyPlugin, SQLAlchemyAsyncConfig, base, SQLAlchemyDTO, SQLAlchemyDTOConfig
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, String, Date, Enum as SqlEnum
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
-from contextlib import asynccontextmanager
-from typing import Any
 from collections.abc import AsyncGenerator, Sequence
 from litestar.exceptions import ClientException, NotFoundException
 
@@ -25,18 +20,19 @@ class CategoryEnum(Enum):
     SHOPPING = "shopping"
     OTHER = "other"
 
-mapper_registry = registry()
-
-@mapper_registry.mapped
-@dataclass
-class Expense:
+class Expense(base.BigIntBase):
     __tablename__ = "expenses"
-    id: Mapped[Annotated[int, dto_field("read-only")]] = mapped_column(Integer, primary_key=True)
     date: Mapped[datetime.date] = mapped_column(Date)
     name: Mapped[str] = mapped_column(String(100))
-    amount: Mapped[int] = mapped_column(Integer)
+    amount_cents: Mapped[int] = mapped_column(Integer)
     category: Mapped[CategoryEnum] = mapped_column(SqlEnum(CategoryEnum))
     description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
+class ReadDTO(SQLAlchemyDTO[Expense]):
+    config = SQLAlchemyDTOConfig(include={"id", "date", "name", "amount_cents", "category", "description"})
+
+class WriteDTO(SQLAlchemyDTO[Expense]):
+    config = SQLAlchemyDTOConfig(exclude={"id"})
 
 # Setup database
 async def provide_transaction(db_session: AsyncSession) -> AsyncGenerator[AsyncSession, None]:
@@ -69,7 +65,7 @@ async def delete_expense() -> None:
 
 db_config = SQLAlchemyAsyncConfig(
     connection_string="sqlite+aiosqlite:///expensetracker.sqlite",
-    metadata=mapper_registry.metadata,
+    metadata=base.BigIntBase.metadata,
     create_all=True,
     before_send_handler="autocommit",
 )
