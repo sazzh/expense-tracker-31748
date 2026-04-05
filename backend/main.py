@@ -5,7 +5,7 @@ from typing import Optional
 from litestar import Litestar, delete, get, post, put
 from litestar.plugins.sqlalchemy import SQLAlchemyPlugin, SQLAlchemyAsyncConfig, base, SQLAlchemyDTO, SQLAlchemyDTOConfig
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer, String, Date, Enum as SqlEnum
+from sqlalchemy import Integer, String, Date, Enum as SqlEnum, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from collections.abc import AsyncGenerator, Sequence
@@ -44,8 +44,9 @@ async def provide_transaction(db_session: AsyncSession) -> AsyncGenerator[AsyncS
 
 # Routes
 @get('/expenses')
-async def get_expenses() -> list[Expense]:
-    ...
+async def get_expenses(transaction: AsyncSession) -> list[Expense]:
+    result = await transaction.execute(select(Expense))
+    return list(result.scalars().all())
 
 @get('/expenses/{expense_id:int}')
 async def get_expense(expense_id: int) -> Expense:
