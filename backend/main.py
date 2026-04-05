@@ -4,6 +4,8 @@ from typing import Optional, Annotated
 from litestar import Litestar, delete, get, post, put
 from litestar.dto import dto_field
 from dataclasses import dataclass
+from sqlalchemy.orm import Mapped, registry, mapped_column
+from sqlalchemy import Integer, String, Date, Enum as SqlEnum
 
 # Models
 class CategoryEnum(Enum):
@@ -14,14 +16,18 @@ class CategoryEnum(Enum):
     SHOPPING = "shopping"
     OTHER = "other"
 
+mapper_registry = registry()
+
+@mapper_registry.mapped
 @dataclass
 class Expense:
-    id: Annotated[int, dto_field("read-only")]
-    date: datetime.date
-    name: str
-    amount: int
-    category: CategoryEnum
-    description: Optional[str]
+    __tablename__ = "expenses"
+    id: Mapped[Annotated[int, dto_field("read-only")]] = mapped_column(Integer, primary_key=True)
+    date: Mapped[datetime.date] = mapped_column(Date)
+    name: Mapped[str] = mapped_column(String(100))
+    amount: Mapped[int] = mapped_column(Integer)
+    category: Mapped[CategoryEnum] = mapped_column(SqlEnum(CategoryEnum))
+    description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
 # Routes
 @get('/expenses')
