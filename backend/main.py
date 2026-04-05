@@ -52,8 +52,10 @@ async def get_expense(expense_id: int) -> Expense:
     ...
 
 @post('/expenses')
-async def create_expense(data: Expense) -> Expense:
-    ...
+async def create_expense(data: Expense, transaction: AsyncSession) -> Expense:
+    transaction.add(data)
+    await transaction.flush()
+    return data
 
 @put('/expenses/{expense_id:int}')
 async def update_expense(expense_id: int, data: Expense) -> Expense:
