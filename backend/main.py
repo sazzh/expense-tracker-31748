@@ -1,6 +1,7 @@
 from collections.abc import AsyncGenerator
 import datetime
 from enum import Enum
+import os
 from typing import Optional
 from litestar import Litestar, delete, get, post, put
 from litestar.plugins.sqlalchemy import SQLAlchemyPlugin, SQLAlchemyAsyncConfig, base, SQLAlchemyDTO, SQLAlchemyDTOConfig
@@ -79,8 +80,9 @@ async def delete_expense(expense_id: int, transaction: AsyncSession) -> None:
         raise NotFoundException(detail="Expense not found")
     await transaction.delete(expense)
 
+BASE = os.path.dirname(os.path.abspath(__file__))
 db_config = SQLAlchemyAsyncConfig(
-    connection_string="sqlite+aiosqlite:///expensetracker.sqlite",
+    connection_string=f"sqlite+aiosqlite:///{BASE}/expensetracker.sqlite",
     metadata=base.BigIntBase.metadata,
     create_all=True,
     before_send_handler="autocommit",
