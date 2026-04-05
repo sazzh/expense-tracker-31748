@@ -49,8 +49,12 @@ async def get_expenses(transaction: AsyncSession) -> list[Expense]:
     return list(result.scalars().all())
 
 @get('/expenses/{expense_id:int}')
-async def get_expense(expense_id: int) -> Expense:
-    ...
+async def get_expense(expense_id: int, transaction: AsyncSession) -> Expense:
+    result = await transaction.execute(select(Expense).where(Expense.id == expense_id))
+    expense = result.scalar_one_or_none()
+    if not expense:
+        raise NotFoundException(detail="Expense not found")
+    return expense
 
 @post('/expenses')
 async def create_expense(data: Expense, transaction: AsyncSession) -> Expense:
