@@ -5,7 +5,7 @@ from typing import Optional
 from litestar import Litestar, delete, get, post, put
 from litestar.plugins.sqlalchemy import SQLAlchemyPlugin, SQLAlchemyAsyncConfig, base, SQLAlchemyDTO, SQLAlchemyDTOConfig
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer, String, Date, Enum as SqlEnum, select
+from sqlalchemy import Integer, String, Date, Enum as SqlEnum, select, inspect
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from collections.abc import AsyncGenerator, Sequence
@@ -62,9 +62,15 @@ async def create_expense(data: Expense, transaction: AsyncSession) -> Expense:
     await transaction.flush()
     return data
 
-@put('/expenses/{expense_id:int}')
-async def update_expense(expense_id: int, data: Expense) -> Expense:
-    ...
+@put('/expenses/{expense_id:int}', dto=WriteDTO, return_dto=ReadDTO)
+async def update_expense(expense_id: int, data: Expense, transaction: AsyncSession) -> Expense:
+    expense = await transaction.get(Expense, expense_id)
+    if not expense:
+        raise NotFoundException(detail="Expense not found")
+    for key, value in data.__dict__.items():
+        if key != "id" and not key.startswith("_"):
+            setattr(expense, key, value)
+    return expense
 
 @delete('/expenses/{expense_id:int}')
 async def delete_expense() -> None:
