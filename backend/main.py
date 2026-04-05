@@ -43,12 +43,12 @@ async def provide_transaction(db_session: AsyncSession) -> AsyncGenerator[AsyncS
         raise ClientException(status_code=409, detail=str(exc)) from exc
 
 # Routes
-@get('/expenses')
+@get('/expenses', return_dto=ReadDTO)
 async def get_expenses(transaction: AsyncSession) -> list[Expense]:
     result = await transaction.execute(select(Expense))
     return list(result.scalars().all())
 
-@get('/expenses/{expense_id:int}')
+@get('/expenses/{expense_id:int}', return_dto=ReadDTO)
 async def get_expense(expense_id: int, transaction: AsyncSession) -> Expense:
     result = await transaction.execute(select(Expense).where(Expense.id == expense_id))
     expense = result.scalar_one_or_none()
@@ -56,7 +56,7 @@ async def get_expense(expense_id: int, transaction: AsyncSession) -> Expense:
         raise NotFoundException(detail="Expense not found")
     return expense
 
-@post('/expenses')
+@post('/expenses', dto=WriteDTO, return_dto=ReadDTO)
 async def create_expense(data: Expense, transaction: AsyncSession) -> Expense:
     transaction.add(data)
     await transaction.flush()
