@@ -65,7 +65,10 @@ class ExpenseController(Controller):
 
     @put('/{expense_id:int}', dto=ExpenseUpdate, return_dto=ExpenseRead)
     async def update_expense(self, expense_id: int, data: Expense, expense_repo: ExpenseRepository) -> Expense:
-        data.id = expense_id
+        expense = await expense_repo.get(expense_id)
+        if not expense:        
+            raise NotFoundException("Expense not found")
+        data.id = expense.id
         return await expense_repo.update(data, auto_commit=True)
 
     @delete('/{expense_id:int}')
