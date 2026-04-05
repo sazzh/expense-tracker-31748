@@ -73,8 +73,11 @@ async def update_expense(expense_id: int, data: Expense, transaction: AsyncSessi
     return expense
 
 @delete('/expenses/{expense_id:int}')
-async def delete_expense() -> None:
-    ...
+async def delete_expense(expense_id: int, transaction: AsyncSession) -> None:
+    expense = await transaction.get(Expense, expense_id)
+    if not expense:
+        raise NotFoundException(detail="Expense not found")
+    await transaction.delete(expense)
 
 db_config = SQLAlchemyAsyncConfig(
     connection_string="sqlite+aiosqlite:///expensetracker.sqlite",
