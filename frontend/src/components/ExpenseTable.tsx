@@ -3,6 +3,7 @@ import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { type Expense } from "../types/Expense";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getExpenses } from "../api/Expenses";
 
 export default function ExpenseTable() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -13,14 +14,7 @@ export default function ExpenseTable() {
     const fetchExpenses = async () => {
       setLoading(true);
       try {
-        const res = await fetch('/api/expenses');
-
-        if (!res.ok) {
-          throw new Error(`Failed to fetch expenses: ${res.status} ${res.statusText}`);
-        }
-
-        const data: Expense[] = await res.json();
-        console.log(data);
+        const data: Expense[] = await getExpenses();
         setExpenses(data);
       } catch (err: unknown) {
         setError(err instanceof Error ? err : new Error(String(err)));
