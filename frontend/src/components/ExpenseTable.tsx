@@ -3,7 +3,7 @@ import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { CATEGORY_COLOURS, type Expense } from "../types/Expense";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getExpenses } from "../api/Expenses";
+import { deleteExpense, getExpenses } from "../api/Expenses";
 
 export default function ExpenseTable() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -25,6 +25,12 @@ export default function ExpenseTable() {
 
     fetchExpenses();
   }, []);
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this expense?")) { return }
+    await deleteExpense(id);
+    setExpenses(expenses.filter(expense => expense.id !== id));
+  }
 
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>Error: {error.message}</Text>;
@@ -63,7 +69,8 @@ export default function ExpenseTable() {
                       component={Link} to={`/expense/${expense.id}`}>
                       <IconEdit stroke={1.25} color="black" />
                     </ActionIcon>
-                    <ActionIcon variant="subtle" aria-label="Delete Expense">
+                    <ActionIcon variant="subtle" aria-label="Delete Expense"
+                      onClick={() => handleDelete(expense.id)}>
                       <IconTrash stroke={1.25} color="var(--danger)" />
                     </ActionIcon>
                   </ActionIcon.Group>

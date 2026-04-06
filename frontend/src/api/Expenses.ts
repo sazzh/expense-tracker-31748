@@ -47,3 +47,15 @@ export async function updateExpense(id: string, data: Omit<Expense, 'id'>): Prom
 
     return res.json();
 }
+
+export async function deleteExpense(id: string): Promise<void> {
+    const res = await fetch(`/api/expenses/${id}`, {
+        method: 'DELETE'
+    }); 
+
+    if (!res.ok) {
+        throw new Error(`Failed to delete expense: ${res.status} ${res.statusText}`);
+    }
+
+    // doesn't return anything
+}
