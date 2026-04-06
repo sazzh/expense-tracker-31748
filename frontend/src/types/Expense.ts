@@ -16,4 +16,13 @@ export const CATEGORIES = [
     "other"
 ]
 
+export const CATEGORY_COLOURS: Record<string, string> = {
+    food: "violet",
+    transport: "blue",
+    entertainment: "green",
+    utilities: "grape",
+    shopping: "cyan",
+    other: "gray"
+}
+
 export type Category = typeof CATEGORIES[number];

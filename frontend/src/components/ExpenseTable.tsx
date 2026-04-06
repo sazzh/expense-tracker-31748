@@ -1,6 +1,6 @@
-import { ActionIcon, Box, Paper, Table, Text } from "@mantine/core";
+import { ActionIcon, Badge, Box, Paper, Pill, Table, Text } from "@mantine/core";
 import { IconEdit, IconTrash } from '@tabler/icons-react'
-import { type Expense } from "../types/Expense";
+import { CATEGORY_COLOURS, type Expense } from "../types/Expense";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getExpenses } from "../api/Expenses";
@@ -35,12 +35,12 @@ export default function ExpenseTable() {
       <Table verticalSpacing="xs" highlightOnHover striped stripedColor="primary.0">
         <Table.Thead bg="primary.3">
           <Table.Tr>
-            <Table.Th ta="center">ID</Table.Th>
-            <Table.Th ta="center">Date</Table.Th>
-            <Table.Th ta="center">Expense</Table.Th>
-            <Table.Th ta="center">Amount ($)</Table.Th>
-            <Table.Th ta="center">Category</Table.Th>
-            <Table.Th ta="center">Description</Table.Th>
+            <Table.Th>ID</Table.Th>
+            <Table.Th>Date</Table.Th>
+            <Table.Th>Expense</Table.Th>
+            <Table.Th>Amount ($)</Table.Th>
+            <Table.Th>Category</Table.Th>
+            <Table.Th>Description</Table.Th>
             <Table.Th>Actions</Table.Th>
           </Table.Tr>
         </Table.Thead>
@@ -51,8 +51,12 @@ export default function ExpenseTable() {
               <Table.Td>{new Intl.DateTimeFormat('en-AU').format(new Date(expense.date))}</Table.Td>
               <Table.Td>{expense.name}</Table.Td>
               <Table.Td>{"$" + (expense.amount_cents / 100).toFixed(2)}</Table.Td>
-              <Table.Td>{expense.category.charAt(0).toUpperCase() + expense.category.slice(1)}</Table.Td>
-              <Table.Td>{expense.description ?? "-"}</Table.Td>
+              <Table.Td>
+                <Badge variant="light" radius="sm" color={CATEGORY_COLOURS[expense.category]}>
+                  {expense.category.charAt(0).toUpperCase() + expense.category.slice(1)}
+                </Badge>
+              </Table.Td>
+              <Table.Td>{expense.description ?? ""}</Table.Td>
               <Table.Td style={{ width: "9%" }}>
                   <ActionIcon.Group>
                     <ActionIcon variant="subtle" aria-label="Edit Expense"

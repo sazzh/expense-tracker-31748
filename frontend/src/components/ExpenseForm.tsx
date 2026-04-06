@@ -1,4 +1,4 @@
-import { Button, Group, NumberInput, Select, Textarea, TextInput } from "@mantine/core";
+import { Box, Button, Group, NumberInput, Select, Textarea, TextInput } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { CATEGORIES, type Expense } from "../types/Expense";
@@ -50,7 +50,9 @@ export default function ExpenseForm({ expense }: ExpenseFormProps) {
   };
 
   return (
+    <Box mx="auto" maw="800">
     <form onSubmit={form.onSubmit(() => handleSubmit())}>
+      <Group align="baseline" grow>
       <TextInput
         withAsterisk
         label="Expense Name"
@@ -72,6 +74,8 @@ export default function ExpenseForm({ expense }: ExpenseFormProps) {
         key={form.key('amount')}
         {...form.getInputProps('amount')}
       />
+      </Group>
+      <Group align="baseline" grow mt="md">
       <DatePickerInput
         withAsterisk
         label="Date of expense"
@@ -95,16 +99,18 @@ export default function ExpenseForm({ expense }: ExpenseFormProps) {
         key={form.key('category')}
         {...form.getInputProps('category')}
       />
-      <Textarea
+      </Group>
+      <Textarea mt="md"
         label="Expense description"
         description="Additional details about the expense (optional)"
         placeholder="Your description..."
         key={form.key('description')}
         {...form.getInputProps('description')}
       />
-      <Group mt="md">
-        <Button type="submit">Submit</Button>
+      <Group mt="xl" justify="center">
+        <Button c="black" type="submit">Submit</Button>
       </Group>
     </form>
+    </Box>
   );
 }
