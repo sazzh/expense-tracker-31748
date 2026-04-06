@@ -1,5 +1,15 @@
 import { type Expense } from "../types/Expense";
 
+export async function getExpense(id: string): Promise<Expense> {
+    const res = await fetch(`/api/expenses/${id}`);
+
+    if (!res.ok) {
+        throw new Error(`Failed to fetch expense: ${res.status} ${res.statusText}`);
+    }
+
+    return res.json();
+}    
+
 export async function createExpense(data: Omit<Expense, 'id'>): Promise<Expense> {
     const res = await fetch('/api/expenses', {
         method: 'POST',

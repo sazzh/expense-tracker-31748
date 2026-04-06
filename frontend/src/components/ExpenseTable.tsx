@@ -2,6 +2,7 @@ import { ActionIcon, Box, Paper, Table, Text } from "@mantine/core";
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { type Expense } from "../types/Expense";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function ExpenseTable() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -60,7 +61,8 @@ export default function ExpenseTable() {
               <Table.Td>{expense.description ?? "-"}</Table.Td>
               <Table.Td style={{ width: "9%" }}>
                   <ActionIcon.Group>
-                    <ActionIcon variant="subtle" aria-label="Edit Expense">
+                    <ActionIcon variant="subtle" aria-label="Edit Expense"
+                      component={Link} to={`/expense/${expense.id}`}>
                       <IconEdit stroke={1.25} color="black" />
                     </ActionIcon>
                     <ActionIcon variant="subtle" aria-label="Delete Expense">

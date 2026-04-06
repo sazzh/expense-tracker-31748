@@ -1,19 +1,23 @@
 import { Button, Group, NumberInput, Select, Textarea, TextInput } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
-import { CATEGORIES } from "../types/Expense";
+import { CATEGORIES, type Expense } from "../types/Expense";
 import { IconCalendarWeek, IconCaretDown, IconCategory2 } from '@tabler/icons-react';
 import { createExpense } from "../api/Expenses";
 
-export default function ExpenseForm() {
+type ExpenseFormProps = {
+  expense?: Expense;
+}
+
+export default function ExpenseForm({ expense }: ExpenseFormProps) {
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
-      name: '',
-      amount: '',
-      date: new Date().toISOString().split('T')[0],
-      category: '',
-      description: '',
+      name: expense?.name ?? '',
+      amount: expense ? (expense.amount_cents / 100).toString() : '',
+      date: expense?.date ?? new Date().toISOString().split('T')[0],
+      category: expense?.category ?? '',
+      description: expense?.description ?? '',
     },
     validate: {
       name: (value) => value.trim().length > 0 ? null : 'Expense name is required',
