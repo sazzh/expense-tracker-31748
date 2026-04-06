@@ -1,6 +1,7 @@
 import { AppShell, Flex, Group, Text } from '@mantine/core';
 import type { ReactNode } from 'react';
 import { IconCalendarDollar } from '@tabler/icons-react';
+import { Link } from 'react-router-dom';
 
 type AppLayoutProps = {
   children: ReactNode;
@@ -14,10 +15,12 @@ export default function AppShellLayout({ children }: AppLayoutProps) {
       padding="md" >
     
       <AppShell.Header>
-        <Group h="100%" px="md">
-          <IconCalendarDollar  />
-          <Text>Expense Tracker</Text>
-        </Group>
+        <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Group h="100%" px="md" gap={8}>
+            <IconCalendarDollar  />
+            <Text>Expense Tracker</Text>
+          </Group>
+        </Link>
       </AppShell.Header>
 
       <AppShell.Main>

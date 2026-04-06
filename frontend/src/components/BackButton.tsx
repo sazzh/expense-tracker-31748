@@ -4,7 +4,7 @@ import { IconArrowLeft } from "@tabler/icons-react";
 export default function BackButton() {
   return (
     <div>
-      <Anchor onClick={() => window.history.back()}>
+      <Anchor c="dark.3" onClick={() => window.history.back()}>
         <Group gap={4}>
           <IconArrowLeft stroke={1.25} />
           back
