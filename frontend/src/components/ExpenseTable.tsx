@@ -1,5 +1,5 @@
-import { ActionIcon, Badge, Box, Paper, Pill, Table, Text } from "@mantine/core";
-import { IconEdit, IconTrash } from '@tabler/icons-react'
+import { ActionIcon, Badge, Box, Paper, Table, Text, TextInput } from "@mantine/core";
+import { IconEdit, IconSearch, IconTrash } from '@tabler/icons-react'
 import { CATEGORY_COLOURS, type Expense } from "../types/Expense";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -9,6 +9,7 @@ export default function ExpenseTable() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -26,6 +27,10 @@ export default function ExpenseTable() {
     fetchExpenses();
   }, []);
 
+  const filtered = expenses.filter((expense) =>
+    expense.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this expense?")) { return }
     await deleteExpense(id);
@@ -36,25 +41,33 @@ export default function ExpenseTable() {
   if (error) return <Text>Error: {error.message}</Text>;
 
   return (
-    <Box mx="auto" w="100%" maw="1050" p="sm">
+    <Box>
+    <TextInput mb="md" leftSection={<IconSearch stroke={1.25} />} placeholder="Search expenses..." value={search} onChange={(e) => setSearch(e.target.value)} />
     <Paper shadow="sm" radius="md" withBorder style={{overflow: "hidden"}}>
       <Table verticalSpacing="xs" highlightOnHover striped stripedColor="primary.0">
         <Table.Thead bg="primary.3">
           <Table.Tr>
-            <Table.Th>ID</Table.Th>
-            <Table.Th>Date</Table.Th>
-            <Table.Th>Expense</Table.Th>
-            <Table.Th>Amount ($)</Table.Th>
-            <Table.Th>Category</Table.Th>
-            <Table.Th>Description</Table.Th>
-            <Table.Th>Actions</Table.Th>
+            <Table.Th w={60} ta="center">ID</Table.Th>
+            <Table.Th w={130} ta="center">Date</Table.Th>
+            <Table.Th w={220}>Expense</Table.Th>
+            <Table.Th w={150}>Amount ($)</Table.Th>
+            <Table.Th w={180}>Category</Table.Th>
+            <Table.Th w={220}>Description</Table.Th>
+            <Table.Th w={90}>Actions</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {expenses.map((expense) =>
+          {filtered.length === 0 ? (
+            <Table.Tr>
+              <Table.Td colSpan={7} align="center">
+                <Text c="dimmed" size="sm" py="xl">No expenses found.</Text>
+              </Table.Td>
+            </Table.Tr>
+          ) : (
+          filtered.map((expense) =>
             <Table.Tr key={expense.id}>
-              <Table.Td>{expense.id}</Table.Td>
-              <Table.Td>{new Intl.DateTimeFormat('en-AU').format(new Date(expense.date))}</Table.Td>
+              <Table.Td ta="center">{expense.id}</Table.Td>
+              <Table.Td ta="center">{new Intl.DateTimeFormat('en-AU').format(new Date(expense.date))}</Table.Td>
               <Table.Td>{expense.name}</Table.Td>
               <Table.Td>{"$" + (expense.amount_cents / 100).toFixed(2)}</Table.Td>
               <Table.Td>
@@ -63,7 +76,7 @@ export default function ExpenseTable() {
                 </Badge>
               </Table.Td>
               <Table.Td>{expense.description ?? ""}</Table.Td>
-              <Table.Td style={{ width: "9%" }}>
+              <Table.Td>
                   <ActionIcon.Group>
                     <ActionIcon variant="subtle" aria-label="Edit Expense"
                       component={Link} to={`/expense/${expense.id}`}>
@@ -76,7 +89,8 @@ export default function ExpenseTable() {
                   </ActionIcon.Group>
               </Table.Td>
             </Table.Tr>
-          )}
+          ))
+        }
         </Table.Tbody>
       </Table>
     </Paper>
