@@ -1,30 +1,42 @@
 import { Button, Group, NumberInput, Select, Textarea, TextInput } from "@mantine/core";
-import { DateInput } from "@mantine/dates";
+import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { CATEGORIES } from "../types/Expense";
-import { IconCaretDown } from '@tabler/icons-react';
-
+import { IconCalendarWeek, IconCaretDown, IconCategory2 } from '@tabler/icons-react';
+import { createExpense } from "../api/Expenses";
 
 export default function ExpenseForm() {
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
       name: '',
-      amount: '', // convert to cents when sending to backend 
-      date: new Date(), // make it this when sending to backend .toISOString().split('T')[0] -> yyyy-mm-dd format
+      amount: '',
+      date: new Date().toISOString().split('T')[0],
       category: '',
       description: '',
     },
     validate: {
       name: (value) => value.trim().length > 0 ? null : 'Expense name is required',
       amount: (value) => typeof value === 'number' && value > 0 ? null : 'Amount must be greater than $0.00',
-      date: (value) => value instanceof Date && !isNaN(value.getTime()) ? null : 'Invalid date',
+      date: (value) => value ? null : 'Please select a date',
       category: (value) => (CATEGORIES as readonly string[]).includes(value) ? null : 'Please select a valid category',
     }
   });
 
+  const handleSubmit = async () => {
+    const vals = form.getValues();
+    await createExpense({
+      name: vals.name.trim(),
+      amount_cents: Math.round(Number(vals.amount) * 100), // convert dollars to cents
+      date: vals.date,
+      category: vals.category,
+      description: vals.description.trim() || undefined,
+    });
+    form.reset();
+  };
+
   return (
-    <form onSubmit={form.onSubmit((values) => console.log(values))}>
+    <form onSubmit={form.onSubmit(() => handleSubmit())}>
       <TextInput
         withAsterisk
         label="Expense Name"
@@ -46,10 +58,12 @@ export default function ExpenseForm() {
         key={form.key('amount')}
         {...form.getInputProps('amount')}
       />
-      <DateInput
+      <DatePickerInput
         withAsterisk
         label="Date of expense"
         placeholder="Select date of expense"
+        valueFormat="DD MMM YYYY"
+        leftSection={<IconCalendarWeek stroke={1.25} />} 
         clearable
         key={form.key('date')}
         {...form.getInputProps('date')}
@@ -62,6 +76,7 @@ export default function ExpenseForm() {
           label: categories.charAt(0).toUpperCase() + categories.slice(1), 
           value: categories
         }))}
+        leftSection={<IconCategory2 stroke={1.25} />}
         rightSection={<IconCaretDown strokeWidth={1.25}/>}
         key={form.key('category')}
         {...form.getInputProps('category')}
