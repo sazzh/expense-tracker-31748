@@ -3,6 +3,7 @@ import ExpenseForm from "../components/ExpenseForm";
 import { useParams } from "react-router-dom";
 import type { Expense } from "../types/Expense";
 import { getExpense } from "../api/Expenses";
+import BackButton from "../components/BackButton";
 
 export function EditExpensePage() {
   const { expenseId } = useParams();
@@ -22,6 +23,7 @@ export function EditExpensePage() {
 
   return (
     <>
+      <BackButton />
       <h1>Edit Expense</h1>
       <ExpenseForm expense={expense} />
     </>
