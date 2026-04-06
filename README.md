@@ -47,6 +47,34 @@ npm run dev
 
 ## Folder Structure
 <!-- brief folder structure explanation -->
+This project is split into `frontend/` and `backend/` folders within a single repository.  
+Further description of key folders and files are mentioned below.
+```
+expense-tracker-31748/
+├── frontend/
+|   ├── public/                 # assets
+|   |   └── favicon.svg
+|   ├── src/
+|   |   ├── api/                # frontend fetch functions for backend endpoints
+|   |   ├── components/         # reusable UI components
+|   |   ├── pages/              # route-level components
+|   |   ├── types/              # TypeScript types
+|   |   ├── App.tsx             # root component
+|   |   ├── main.tsx            # entry point, mounts app to DOM
+|   |   ├── Router.tsx          # React Router route definitions
+|   |   ├── index.css           # global styles
+|   |   └── theme.ts            # Mantine theme config
+|   ├── vite.config.ts
+|   ├── package.json            # frontend dependencies
+|   └── index.html              # root HTML file
+├── backend/
+|   ├── main.py                 # Litestar app, models, and routes
+|   ├── expensetracker.sqlite   # local SQLite database file
+|   ├── pyproject.toml          # Python dependencies
+|   └── uv.lock
+├── package.json                # root scripts (concurrently)
+└── README.md                   
+```
 
 ## Challenges Overcome
 <!-- summary of challenges overcome - 4/5 sentences okay -->
