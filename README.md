@@ -4,6 +4,33 @@ Chosen Project: Expense Tracker
 
 ## Problem
 <!-- a 2 line summary of problem this website solves -->
+It can be overwhelming and tedious to manually track your day to day expenses.
+This web app makes it possible to track and categorise your spending all in one place.
+You can easily add all your past and upcoming expenses, as well as view your expenditure by categories and monthly trends.
+This way you can even see what is costing you the most and make necessary cutbacks.
+
+## How to Run
+1. Clone the repo
+```sh
+git clone https://github.com/sazzh/expense-tracker-31748.git
+cd expense-tracker-31748
+```
+2. Install dependencies
+```sh
+npm install
+
+cd frontend
+npm install
+
+cd ../backend
+uv sync
+```
+3. Run frontend and backend concurrently
+```sh
+cd ..
+npm run dev
+```
+4. Navigate to `http://localhost:5173` and have fun!
 
 ## Tech Stack
 <!-- illustration of technical stack, including frontend, styling, routing, data, and deployment (if applicable) -->
