@@ -3,18 +3,20 @@ import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { CATEGORIES, type Expense } from "../types/Expense";
 import { IconCalendarWeek, IconCaretDown, IconCategory2 } from '@tabler/icons-react';
-import { createExpense } from "../api/Expenses";
+import { createExpense, updateExpense } from "../api/Expenses";
+import { useNavigate } from "react-router";
 
 type ExpenseFormProps = {
   expense?: Expense;
 }
 
 export default function ExpenseForm({ expense }: ExpenseFormProps) {
+  const navigate = useNavigate();
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
       name: expense?.name ?? '',
-      amount: expense ? (expense.amount_cents / 100).toString() : '',
+      amount: expense ? (expense.amount_cents / 100) : '',
       date: expense?.date ?? new Date().toISOString().split('T')[0],
       category: expense?.category ?? '',
       description: expense?.description ?? '',
@@ -29,14 +31,22 @@ export default function ExpenseForm({ expense }: ExpenseFormProps) {
 
   const handleSubmit = async () => {
     const vals = form.getValues();
-    await createExpense({
+
+    const body = {
       name: vals.name.trim(),
       amount_cents: Math.round(Number(vals.amount) * 100), // convert dollars to cents
       date: vals.date,
       category: vals.category,
       description: vals.description.trim() || undefined,
-    });
-    form.reset();
+    }
+
+    if (expense) {
+      await updateExpense(expense.id, body);
+    } else {
+      await createExpense(body);
+    }
+
+    navigate('/');
   };
 
   return (
