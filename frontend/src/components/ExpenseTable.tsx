@@ -1,9 +1,10 @@
-import { ActionIcon, Badge, Box, Paper, Table, Text, TextInput } from "@mantine/core";
-import { IconEdit, IconSearch, IconTrash } from '@tabler/icons-react'
+import { ActionIcon, Badge, Box, Paper, Table, Text } from "@mantine/core";
+import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { CATEGORY_COLOURS, type Expense } from "../types/Expense";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { deleteExpense, getExpenses } from "../api/Expenses";
+import ExpenseFilters from "./ExpenseFilters";
 
 export default function ExpenseTable() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -42,7 +43,7 @@ export default function ExpenseTable() {
 
   return (
     <Box>
-    <TextInput mb="md" leftSection={<IconSearch stroke={1.25} />} placeholder="Search expenses..." value={search} onChange={(e) => setSearch(e.target.value)} />
+    <ExpenseFilters search={search} onSearchChange={setSearch} />
     <Paper shadow="sm" radius="md" withBorder style={{overflow: "hidden"}}>
       <Table verticalSpacing="xs" highlightOnHover striped stripedColor="primary.0">
         <Table.Thead bg="primary.3">
