@@ -3,7 +3,7 @@ export type Expense = {
     date: string;
     name: string;
     amount_cents: number; // cents for best math conversion
-    category: string;
+    category: Category;
     description?: string | null;
 };
 
@@ -14,9 +14,9 @@ export const CATEGORIES = [
     "utilities",
     "shopping",
     "other"
-]
+] as const;
 
-export const CATEGORY_COLOURS: Record<string, string> = {
+export const CATEGORY_COLOURS: Record<Category, string> = {
     food: "violet",
     transport: "blue",
     entertainment: "green",

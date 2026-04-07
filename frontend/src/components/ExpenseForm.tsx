@@ -1,7 +1,7 @@
 import { Box, Button, Group, NumberInput, Select, Textarea, TextInput } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
-import { CATEGORIES, type Expense } from "../types/Expense";
+import { CATEGORIES, type Category, type Expense } from "../types/Expense";
 import { IconCalendarWeek, IconCaretDown, IconCategory2 } from '@tabler/icons-react';
 import { createExpense, updateExpense } from "../api/Expenses";
 import { useNavigate } from "react-router";
@@ -36,7 +36,7 @@ export default function ExpenseForm({ expense }: ExpenseFormProps) {
       name: vals.name.trim(),
       amount_cents: Math.round(Number(vals.amount) * 100), // convert dollars to cents
       date: vals.date,
-      category: vals.category,
+      category: vals.category as Category,
       description: vals.description.trim() || undefined,
     }
 

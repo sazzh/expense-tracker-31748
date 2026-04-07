@@ -1,6 +1,6 @@
 import { ActionIcon, Badge, Box, Paper, Table, Text } from "@mantine/core";
 import { IconEdit, IconTrash } from '@tabler/icons-react'
-import { CATEGORY_COLOURS, type Expense } from "../types/Expense";
+import { CATEGORY_COLOURS, type Category, type Expense } from "../types/Expense";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { deleteExpense, getExpenses } from "../api/Expenses";
@@ -11,6 +11,7 @@ export default function ExpenseTable() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [search, setSearch] = useState('');
+  const [category, setCategory] = useState<Category[]>([]);
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -28,9 +29,11 @@ export default function ExpenseTable() {
     fetchExpenses();
   }, []);
 
-  const filtered = expenses.filter((expense) =>
-    expense.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = expenses.filter((expense) => {
+    const matchesSearch = expense.name.toLowerCase().includes(search.toLowerCase());
+    const matchesCategory = category.length > 0 ? category.includes(expense.category) : true;
+    return matchesSearch && matchesCategory;
+  });
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this expense?")) { return }
@@ -43,7 +46,7 @@ export default function ExpenseTable() {
 
   return (
     <Box>
-    <ExpenseFilters search={search} onSearchChange={setSearch} />
+    <ExpenseFilters search={search} onSearchChange={setSearch} category={category} onCategoryChange={setCategory} />
     <Paper shadow="sm" radius="md" withBorder style={{overflow: "hidden"}}>
       <Table verticalSpacing="xs" highlightOnHover striped stripedColor="primary.0">
         <Table.Thead bg="primary.3">
