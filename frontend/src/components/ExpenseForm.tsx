@@ -107,7 +107,7 @@ export default function ExpenseForm({ expense }: ExpenseFormProps) {
         key={form.key('description')}
         {...form.getInputProps('description')}
       />
-      <Group mt="xl" justify="center">
+      <Group className="btn">
         <Button c="black" type="submit">Submit</Button>
       </Group>
     </form>
