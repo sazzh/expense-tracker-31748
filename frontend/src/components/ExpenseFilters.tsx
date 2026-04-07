@@ -1,4 +1,4 @@
-import { Group, MultiSelect, TextInput } from "@mantine/core";
+import { Button, Flex, MultiSelect, TextInput } from "@mantine/core";
 import { IconCaretDown, IconCategory2, IconSearch } from "@tabler/icons-react";
 import { CATEGORIES, type Category } from "../types/Expense";
 
@@ -11,16 +11,14 @@ type filterProps = {
 
 export default function ExpenseFilters({ search, category, onSearchChange, onCategoryChange }: filterProps) {
   return (
-    <Group grow>
-      <TextInput 
-        mb="md"
+    <Flex gap="md" mb="md">
+      <TextInput style={{ flex: 1, minWidth: 0 }}
         leftSection={<IconSearch stroke={1.25} />}
         placeholder="Search expenses..."
         value={search}
         onChange={(e) => onSearchChange(e.currentTarget.value)}
       />
-      <MultiSelect<Category>
-        mb="md"
+      <MultiSelect<Category> style={{ flex: 2, minWidth: 0 }}
         placeholder="Expense category"
         leftSection={<IconCategory2 stroke={1.25} />}
         rightSection={<IconCaretDown color="silver" strokeWidth={1.25}/>}
@@ -28,6 +26,7 @@ export default function ExpenseFilters({ search, category, onSearchChange, onCat
         searchable
         hidePickedOptions
         maxValues={3}
+        
         data={CATEGORIES.map((category) => ({ 
           label: category.charAt(0).toUpperCase() + category.slice(1), 
           value: category
@@ -35,6 +34,13 @@ export default function ExpenseFilters({ search, category, onSearchChange, onCat
         value={category}
         onChange={onCategoryChange}
       />
-    </Group>
+      <Button style={{ flex: 1, minWidth: 0 }}
+        variant="outline" 
+        c="black"
+        onClick={() => { onSearchChange(''); onCategoryChange([]) }}
+        >
+        Clear filters
+      </Button>
+    </Flex>
   )
 }
