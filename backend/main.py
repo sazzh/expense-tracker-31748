@@ -6,7 +6,7 @@ from typing import Optional
 from litestar import Litestar, delete, get, post, put
 from litestar.plugins.sqlalchemy import SQLAlchemyPlugin, SQLAlchemyAsyncConfig, base, SQLAlchemyDTO, SQLAlchemyDTOConfig
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer, String, Date, Enum as SqlEnum, select, inspect
+from sqlalchemy import Integer, String, Date, Enum as SqlEnum, func, select, inspect
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from collections.abc import AsyncGenerator, Sequence
@@ -80,6 +80,15 @@ async def delete_expense(expense_id: int, transaction: AsyncSession) -> None:
         raise NotFoundException(detail="Expense not found")
     await transaction.delete(expense)
 
+# Routes for trends
+@get('/expenses/category')
+async def get_expenses_by_category(transaction: AsyncSession) -> list[dict[str, str | int]]:
+    query = select(Expense.category, func.sum(Expense.amount_cents).label("total")).group_by(Expense.category)
+    result = await transaction.execute(query)
+    data = [{"category": row.category, "total": row.total} for row in result.all()]
+    return data
+
+# Setup application including db
 BASE = os.path.dirname(os.path.abspath(__file__))
 db_config = SQLAlchemyAsyncConfig(
     connection_string=f"sqlite+aiosqlite:///{BASE}/expensetracker.sqlite",
@@ -89,7 +98,7 @@ db_config = SQLAlchemyAsyncConfig(
 )
 
 app = Litestar(
-    [get_expenses, get_expense, create_expense, update_expense, delete_expense],
+    [get_expenses, get_expense, create_expense, update_expense, delete_expense, get_expenses_by_category],
     dependencies={"transaction": provide_transaction},
     plugins=[SQLAlchemyPlugin(db_config)],
 )

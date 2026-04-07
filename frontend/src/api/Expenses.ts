@@ -59,3 +59,13 @@ export async function deleteExpense(id: string): Promise<void> {
 
     // doesn't return anything
 }
+
+export async function getExpensesByCategory(): Promise<{ category: string, total: number }[]> {
+    const res = await fetch('/api/expenses/category');
+
+    if (!res.ok) {
+        throw new Error(`Failed to fetch expenses by category: ${res.status} ${res.statusText}`);
+    }
+
+    return res.json();
+}
