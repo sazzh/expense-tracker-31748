@@ -50,20 +50,7 @@ body {
 
 h1,
 h2 {
-  margin: 0;
+  margin: 0 0 1rem 0;
   color: var(--text);
   text-align: center;
-}
-
-#testdiv {
-  background: var(--gradient);
-  padding: 1.5rem;
-  border-radius: 1rem;
-  border: var(--border-card);
-  border-top: solid 1px var(--highlight);
-  box-shadow: var(--shadow);
-}
-
-#testdiv:hover {
-  background: var(--gradient-hover);
 }
