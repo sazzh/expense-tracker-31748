@@ -3,6 +3,7 @@ import { HomePage } from "./pages/Home.page";
 import AppShellLayout from "./components/AppLayout";
 import { AddExpensePage } from "./pages/AddExpense.page";
 import { EditExpensePage } from "./pages/EditExpense.page";
+import { TrendsPage } from "./pages/Trends.page";
 
 function ShellRoute() {
   return (
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: '/expense/:expenseId',
         element: <EditExpensePage />
+      },
+      {
+        path: '/trends',
+        element: <TrendsPage />
       }
     ]
   },

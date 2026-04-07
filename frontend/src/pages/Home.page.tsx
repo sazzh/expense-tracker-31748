@@ -14,6 +14,7 @@ export function HomePage() {
         <ExpenseTable />
         <div className="btn">
           <Button c="black"  onClick={() => navigate('/expense')}>Add new expense</Button>
+          <Button c="black"  onClick={() => navigate('/trends')}>View Trends</Button>
         </div>
       </Box>
     </>
