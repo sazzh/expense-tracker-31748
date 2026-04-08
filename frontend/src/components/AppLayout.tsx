@@ -10,8 +10,8 @@ type AppLayoutProps = {
 export default function AppShellLayout({ children }: AppLayoutProps) {
   return (
     <AppShell
-      header={{ height: { base: 40, md: 50, lg: 60 } }}
-      footer={{ height: { base: 40, md: 50, lg: 60 } }}
+      header={{ height: { base: 30, md: 40, lg: 50 } }}
+      footer={{ height: { base: 30, md: 40, lg: 50 } }}
       padding="md" >
     
       <AppShell.Header>
