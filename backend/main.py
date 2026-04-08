@@ -88,6 +88,15 @@ async def get_expenses_by_category(transaction: AsyncSession) -> list[dict[str, 
     data = [{"category": row.category, "total": row.total} for row in result.all()]
     return data
 
+@get('/expenses/month')
+async def get_expenses_by_month(transaction: AsyncSession) -> list[dict[str, str | int]]:
+    query = select(func.strftime("%Y-%m", Expense.date).label("month"),
+                   func.sum(Expense.amount_cents).label("total")
+                ).group_by("month").order_by("month")
+    result = await transaction.execute(query)
+    data = [{"month": row.month, "total": row.total} for row in result.all()]
+    return data
+
 # Setup application including db
 BASE = os.path.dirname(os.path.abspath(__file__))
 db_config = SQLAlchemyAsyncConfig(
@@ -98,7 +107,7 @@ db_config = SQLAlchemyAsyncConfig(
 )
 
 app = Litestar(
-    [get_expenses, get_expense, create_expense, update_expense, delete_expense, get_expenses_by_category],
+    [get_expenses, get_expense, create_expense, update_expense, delete_expense, get_expenses_by_category, get_expenses_by_month],
     dependencies={"transaction": provide_transaction},
     plugins=[SQLAlchemyPlugin(db_config)],
 )

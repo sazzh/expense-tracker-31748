@@ -69,3 +69,13 @@ export async function getExpensesByCategory(): Promise<{ category: string, total
 
     return res.json();
 }
+
+export async function getExpensesByMonth(): Promise<{ month: string, total: number }[]> {
+    const res = await fetch('/api/expenses/month');
+
+    if (!res.ok) {
+        throw new Error(`Failed to fetch expenses by month: ${res.status} ${res.statusText}`);
+    }
+
+    return res.json();
+}
