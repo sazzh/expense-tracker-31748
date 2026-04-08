@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import type { Expense } from "../types/Expense";
 import { getExpense } from "../api/Expenses";
 import BackButton from "../components/BackButton";
+import { LoadingOverlay } from "@mantine/core";
 
 export function EditExpensePage() {
   const { expenseId } = useParams();
@@ -18,7 +19,7 @@ export function EditExpensePage() {
   }, [expenseId]);
 
   if (!expense) {
-    return <div>Loading...</div>;
+    return <LoadingOverlay visible={true} />;
   }
 
   return (
