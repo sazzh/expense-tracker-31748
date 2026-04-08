@@ -1,19 +1,18 @@
 import { DonutChart } from "@mantine/charts";
 import { CATEGORY_COLOURS, type Category } from "../types/Expense";
-import { Box, Divider, Group, Paper, Stack, Text } from "@mantine/core";
+import { Box, Divider, Group, Stack, Text } from "@mantine/core";
 
 export default function CategoryDonutChart({ byCategory }: { byCategory: { category: string, total: number }[] }) {
   const sortedCategories = [...byCategory].sort((a, b) => b.total - a.total)
   const total = byCategory.reduce((sum, item) => sum + item.total, 0)
 
   return (
-    <Paper shadow="sm" px="xl" py="md" radius="md" withBorder style={{overflow: "hidden"}}>
+    <Stack align="center">
     <Text size="sm" fw={700}>Total Expenditure by Category</Text>
-    <Stack>
       <DonutChart
         size={200}
         thickness={30}
-        paddingAngle={2}
+        paddingAngle={1}
         tooltipDataSource="segment"
         chartLabel="Category"
         valueFormatter={(value) => `$${(value / 100).toFixed(2)}`}
@@ -48,6 +47,5 @@ export default function CategoryDonutChart({ byCategory }: { byCategory: { categ
         </Group>
       </Stack>
     </Stack>
-    </Paper>
   );
 }
