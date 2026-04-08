@@ -79,7 +79,7 @@ export default function ExpenseTable() {
                   {expense.category.charAt(0).toUpperCase() + expense.category.slice(1)}
                 </Badge>
               </Table.Td>
-              <Table.Td>{expense.description ?? ""}</Table.Td>
+              <Table.Td style={{ color: '#868e96'}}>{expense.description ?? ""}</Table.Td>
               <Table.Td>
                   <ActionIcon.Group>
                     <ActionIcon variant="subtle" aria-label="Edit Expense"
