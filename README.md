@@ -44,6 +44,12 @@ npm run dev
 
 ## Feature List
 <!-- feature list - bullet point list such as 'Responsive mobile design', 'Dynamic filtering', 'Dark mode toggle' -->
+- Responsive layout
+- Search and multi-select filtering
+- Form validation
+- Dynamic data visualisation with charts
+- API integration
+- Client-side routing (SPA) 
 
 ## Folder Structure
 <!-- brief folder structure explanation -->
@@ -78,3 +84,6 @@ expense-tracker-31748/
 
 ## Challenges Overcome
 <!-- summary of challenges overcome - 4/5 sentences okay -->
+1. The main challenge I faced was setting up and connecting the database. I chose a different backend framework than the lectures/tutorials as I am more familiar with Litestar over FastAPI. However, I hadn't actually setup a database within Litestar, I had only worked locally or with simpler configurations. I created several branches to experiment with different database setups, originally overdesigning and making it more complex than necessary. Eventually I was able to work out the config and models that worked. I struggled choosing the best model type (dataclass, pydantic, etc.) as then I had to setup the database table to match which is where I was getting a few more errors.  
+
+2. Another challenge I faced was the amount of frontend work required, which initially felt overwhelming. To address this, I first planned the interface using Figma and setup the CSS structure and colour scheme at the beginning of the project. This made coding more manageable, as I could focus on implementing functionality without needing to design at the same time. It also helped ensure that the overall design remained consistent throughout the application.
