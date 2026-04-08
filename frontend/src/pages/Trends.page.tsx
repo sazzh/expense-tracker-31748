@@ -30,7 +30,6 @@ export function TrendsPage() {
           category as well as monthly expenditure trends.</Text>
       </Box>
       <Stack align="center" justify="center">
-        <Text size="sm">Total expenditure by category:</Text>
         <CategoryDonutChart byCategory={byCategory} />
       </Stack>      
     </>
