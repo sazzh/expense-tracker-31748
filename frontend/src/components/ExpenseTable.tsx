@@ -33,7 +33,7 @@ export default function ExpenseTable() {
     const matchesSearch = expense.name.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = category.length > 0 ? category.includes(expense.category) : true;
     return matchesSearch && matchesCategory;
-  });
+  }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this expense?")) { return }
