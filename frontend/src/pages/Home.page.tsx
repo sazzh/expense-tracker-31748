@@ -9,7 +9,8 @@ export function HomePage() {
     <>
       <Box mx="auto" w="100%" maw="1050" p="sm">
         <h1 className="title">Your Expense Logbook</h1>
-        <Text c="dimmed" size="sm" ml="lg">Welcome to your expense logbook! Here you can view and manage all your expenses.</Text>
+        <Text c="dimmed" size="sm" ml="lg">Welcome to your expense logbook!</Text>
+        <Text c="dimmed" size="sm" ml="lg">Here you can view and manage all your expenses.</Text>
         <Text c="dimmed" size="sm" ml="lg" mb="lg">Click on view trends to see your detailed spending patterns.</Text>
         <ExpenseTable />
         <div className="btn">

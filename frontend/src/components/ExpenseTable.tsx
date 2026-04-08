@@ -1,4 +1,4 @@
-import { ActionIcon, Badge, Box, Paper, Table, Text } from "@mantine/core";
+import { ActionIcon, Badge, Box, LoadingOverlay, Paper, Table, Text } from "@mantine/core";
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { CATEGORY_COLOURS, type Category, type Expense } from "../types/Expense";
 import { useEffect, useState } from "react";
@@ -41,7 +41,7 @@ export default function ExpenseTable() {
     setExpenses(expenses.filter(expense => expense.id !== id));
   }
 
-  if (loading) return <Text>Loading...</Text>;
+  if (loading) return <LoadingOverlay visible={true} />;
   if (error) return <Text>Error: {error.message}</Text>;
 
   return (
