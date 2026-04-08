@@ -9,6 +9,10 @@ export default function CategoryDonutChart({ byCategory }: { byCategory: { categ
   return (
     <Stack align="center">
     <Text size="sm" fw={700}>Total Expenditure by Category</Text>
+    {byCategory.length === 0 ? ( 
+      <Text c="dimmed" size="sm">No data available</Text>
+    ) : (
+      <Box>
       <DonutChart
         size={200}
         thickness={30}
@@ -46,6 +50,8 @@ export default function CategoryDonutChart({ byCategory }: { byCategory: { categ
           </Text>
         </Group>
       </Stack>
+      </Box>
+    )}
     </Stack>
   );
 }

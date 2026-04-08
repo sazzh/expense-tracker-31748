@@ -5,6 +5,9 @@ export default function ExpenseBarChart({ byMonth }: { byMonth: { month: string,
   return (
     <Stack align="center">
       <Text size="sm" fw={700} mb="md">Total Monthly Expenditure</Text>
+      {byMonth.length === 0 ? (
+        <Text c="dimmed" size="sm">No data available</Text>
+      ) : (
       <BarChart pb="md"
         h={350}
         w={400}
@@ -16,6 +19,7 @@ export default function ExpenseBarChart({ byMonth }: { byMonth: { month: string,
           { name: 'total', label: 'Total Expenses', color: 'primary' }, 
         ]}
       />
+      )}
     </Stack>
   )
 }
