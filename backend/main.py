@@ -1,4 +1,5 @@
 from collections.abc import AsyncGenerator
+from dataclasses import dataclass
 import datetime
 from enum import Enum
 import os
@@ -11,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from collections.abc import AsyncGenerator, Sequence
 from litestar.exceptions import ClientException, HTTPException, NotFoundException
+import bcrypt
 
 # Models
 class CategoryEnum(Enum):
@@ -42,7 +44,13 @@ class User(base.BigIntBase):
     role: Mapped[str] = mapped_column(String(20), default="user") # user or admin
 
 class UserDTO(SQLAlchemyDTO[User]):
-    config = SQLAlchemyDTOConfig(exclude={"id"})
+    config = SQLAlchemyDTOConfig(exclude={"id", "password"})
+
+@dataclass
+class RegisterDTO:
+    username: str
+    password: str
+    confirmPassword: str
 
 # Setup database
 async def provide_transaction(db_session: AsyncSession) -> AsyncGenerator[AsyncSession, None]:
@@ -53,20 +61,34 @@ async def provide_transaction(db_session: AsyncSession) -> AsyncGenerator[AsyncS
         raise ClientException(status_code=409, detail=str(exc)) from exc
     
 # User Routes and Functions
-@post('/register', dto=UserDTO)
-async def register_user(data: User, transaction: AsyncSession) -> User:
+# hash password before storing in database
+def get_password_hash(password: str) -> str:
+    pwd_bytes = password.encode("utf-8")
+    salt = bcrypt.gensalt(rounds=12)
+    hashed = bcrypt.hashpw(pwd_bytes, salt)
+    return hashed.decode("utf-8")
+
+# verify provided password against hashed one in database
+# encode both to bytes then use checkpw to compare
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    pwd_bytes = plain_password.encode("utf-8")
+    hashed_bytes = hashed_password.encode("utf-8")
+    return bcrypt.checkpw(pwd_bytes, hashed_bytes)
+
+@post('/register', return_dto=UserDTO)
+async def register_user(data: RegisterDTO, transaction: AsyncSession) -> User:
+    if data.password != data.confirmPassword:
+        raise HTTPException(status_code=400, detail="Passwords do not match")
+
     existing_user = await transaction.scalar(select(User).where(User.username == data.username))
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
-    
+        
     user = User(
         username=data.username,
-        password=data.password, # see if plain works first then hash
+        password=get_password_hash(data.password),
         role="user",
     )
-
-    # hashed = bcrypt.hashpw(data.password.encode(), bcrypt.gensalt()).decode()
-
     transaction.add(user)
     await transaction.flush()
     return user

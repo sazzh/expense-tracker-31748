@@ -19,6 +19,11 @@ export function RegisterPage() {
       const formData = new FormData(event.target);
       const json = Object.fromEntries(formData.entries());
 
+      if (json.password !== json.confirmPassword) {
+        alert("Provided passwords do not match");
+        return;
+      }
+
       const res = await fetch('/api/register', {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
