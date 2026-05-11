@@ -4,6 +4,7 @@ import AppShellLayout from "./components/AppLayout";
 import { AddExpensePage } from "./pages/AddExpense.page";
 import { EditExpensePage } from "./pages/EditExpense.page";
 import { TrendsPage } from "./pages/Trends.page";
+import { LoginPage } from "./pages/Login.page";
 
 function ShellRoute() {
   return (
@@ -16,6 +17,11 @@ function ShellRoute() {
 const router = createBrowserRouter([
   {
     element: <ShellRoute />, children: [
+      {
+        path: '/login',
+        element: <LoginPage />
+      },
+      // do protected route thing
       {
         path: '/',
         element: <HomePage />
