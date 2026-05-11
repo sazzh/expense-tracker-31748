@@ -15,6 +15,20 @@ export function RegisterPage() {
 
   const handleRegistration = async (event: React.SubmitEvent) => {
     event.preventDefault();
+    try {
+      const formData = new FormData(event.target);
+      const json = Object.fromEntries(formData.entries());
+
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(json),
+      });
+      const data = await res.json();
+      // store user info and token in localStorage
+    } catch (err) {
+      alert("Server connection error");
+    }
   };
 
   return (
@@ -24,6 +38,7 @@ export function RegisterPage() {
           <h1>Expense Tracker Registration</h1>
           <form onSubmit={handleRegistration}>
             <TextInput mt="xl"
+              name="username"
               label="Username"
               placeholder="Please enter a username"
               leftSection={<IconUserPentagon size={18} stroke={1.5} />}
@@ -32,6 +47,7 @@ export function RegisterPage() {
               {...form.getInputProps('username')}
             />
             <PasswordInput mt="md"
+              name="password"
               label="Password"
               placeholder="Please enter a strong password"
               leftSection={<IconAsterisk size={18} stroke={1.5} />}
@@ -43,6 +59,7 @@ export function RegisterPage() {
               {...form.getInputProps('password')}
             />
             <PasswordInput mt="md"
+              name="confirmPassword"
               label="Confirm Password"
               placeholder="Please re-enter your password"
               leftSection={<IconAsterisk size={18} stroke={1.5} />}

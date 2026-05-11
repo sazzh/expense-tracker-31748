@@ -10,7 +10,7 @@ from sqlalchemy import Integer, String, Date, Enum as SqlEnum, func, select, ins
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from collections.abc import AsyncGenerator, Sequence
-from litestar.exceptions import ClientException, NotFoundException
+from litestar.exceptions import ClientException, HTTPException, NotFoundException
 
 # Models
 class CategoryEnum(Enum):
@@ -35,6 +35,15 @@ class ReadDTO(SQLAlchemyDTO[Expense]):
 class WriteDTO(SQLAlchemyDTO[Expense]):
     config = SQLAlchemyDTOConfig(exclude={"id"})
 
+class User(base.BigIntBase):
+    __tablename__ = "users"
+    username: Mapped[str] = mapped_column(String(100), unique=True)
+    password: Mapped[str] = mapped_column(String(50))
+    role: Mapped[str] = mapped_column(String(20), default="user") # user or admin
+
+class UserDTO(SQLAlchemyDTO[User]):
+    config = SQLAlchemyDTOConfig(exclude={"id"})
+
 # Setup database
 async def provide_transaction(db_session: AsyncSession) -> AsyncGenerator[AsyncSession, None]:
     try:
@@ -42,8 +51,27 @@ async def provide_transaction(db_session: AsyncSession) -> AsyncGenerator[AsyncS
             yield db_session
     except IntegrityError as exc:
         raise ClientException(status_code=409, detail=str(exc)) from exc
+    
+# User Routes and Functions
+@post('/register', dto=UserDTO)
+async def register_user(data: User, transaction: AsyncSession) -> User:
+    existing_user = await transaction.scalar(select(User).where(User.username == data.username))
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already exists")
+    
+    user = User(
+        username=data.username,
+        password=data.password, # see if plain works first then hash
+        role="user",
+    )
 
-# Routes
+    # hashed = bcrypt.hashpw(data.password.encode(), bcrypt.gensalt()).decode()
+
+    transaction.add(user)
+    await transaction.flush()
+    return user
+
+# Expense Routes
 @get('/expenses', return_dto=ReadDTO)
 async def get_expenses(transaction: AsyncSession) -> list[Expense]:
     result = await transaction.execute(select(Expense))
@@ -107,7 +135,9 @@ db_config = SQLAlchemyAsyncConfig(
 )
 
 app = Litestar(
-    [get_expenses, get_expense, create_expense, update_expense, delete_expense, get_expenses_by_category, get_expenses_by_month],
+    [register_user,
+    get_expenses, get_expense, create_expense, update_expense, delete_expense, get_expenses_by_category, get_expenses_by_month],
     dependencies={"transaction": provide_transaction},
     plugins=[SQLAlchemyPlugin(db_config)],
+    debug=True,
 )
