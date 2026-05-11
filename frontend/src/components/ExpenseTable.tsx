@@ -42,7 +42,6 @@ export default function ExpenseTable() {
   }
 
   if (loading) return <LoadingOverlay visible={true} />;
-  if (error) return <Text>Error: {error.message}</Text>;
 
   return (
     <Box>
@@ -61,7 +60,13 @@ export default function ExpenseTable() {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {filtered.length === 0 ? (
+          {error ? (
+            <Table.Tr>
+              <Table.Td colSpan={7} align="center">
+                <Text c="dimmed" size="sm" py="xl">Unable to retrieve your expenses currently. Please try again later.</Text>
+              </Table.Td>
+            </Table.Tr>
+          ) : filtered.length === 0 ? (
             <Table.Tr>
               <Table.Td colSpan={7} align="center">
                 <Text c="dimmed" size="sm" py="xl">No expenses found.</Text>
