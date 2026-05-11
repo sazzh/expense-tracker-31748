@@ -2,6 +2,7 @@ import { Box, Button, Group, Paper, TextInput, Text, PasswordInput } from "@mant
 import { useForm } from "@mantine/form";
 import { IconUserPentagon } from '@tabler/icons-react';
 import { IconAsterisk } from '@tabler/icons-react';
+import { Link } from "react-router-dom";
 
 export function LoginPage() {
   const form = useForm({
@@ -46,9 +47,10 @@ export function LoginPage() {
             </Group>
           </form>
         </Paper>
-        <Text ta="center" mt="md">
-          Don't have an account yet? Register now!
-        </Text>
+        <Group mt="md" justify="center">
+          <Text>Don't have an account yet?</Text>
+          <Link to="/register">Register now!</Link>
+        </Group>
       </Box>
     </>
   )
