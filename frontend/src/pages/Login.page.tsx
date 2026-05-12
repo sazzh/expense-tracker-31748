@@ -31,7 +31,11 @@ export function LoginPage() {
         localStorage.setItem('token', data.access_token);
         localStorage.setItem('username', data.username);
         localStorage.setItem('role', data.role);
-        navigate('/');
+        if (data.role === "admin") {
+          navigate('/admin-dashboard');
+        } else {
+          navigate('/');
+        }
       } else {
         alert(data.detail || "Login failed. Please check your credentials");
       }
