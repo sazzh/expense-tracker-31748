@@ -53,7 +53,7 @@ class User(base.BigIntBase):
     role: Mapped[str] = mapped_column(String(20), default="user") # user or admin
 
 class UserDTO(SQLAlchemyDTO[User]):
-    config = SQLAlchemyDTOConfig(exclude={"id", "password"})
+    config = SQLAlchemyDTOConfig(exclude={"password"})
 
 @dataclass
 class RegisterDTO:
@@ -218,6 +218,11 @@ async def delete_expense(expense_id: int, transaction: AsyncSession) -> None:
     if not expense:
         raise NotFoundException(detail="Expense not found")
     await transaction.delete(expense)
+
+@get('/admin/users', return_dto=UserDTO)
+async def get_users(transaction: AsyncSession) -> list[User]:
+    result = await transaction.execute(select(User))
+    return list(result.scalars().all())
 
 # Trend Routes
 @get('/expenses/category')
