@@ -224,6 +224,19 @@ async def get_users(transaction: AsyncSession) -> list[User]:
     result = await transaction.execute(select(User))
     return list(result.scalars().all())
 
+@get('/admin/users/{user_id:int}', return_dto=UserDTO)
+async def get_user(user_id: int, transaction: AsyncSession) -> User:
+    result = await transaction.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+@get('/admin/users/{user_id:int}/expenses', return_dto=ReadDTO)
+async def get_all_user_expenses(user_id: int, transaction: AsyncSession) -> list[Expense]:
+    result = await transaction.execute(select(Expense).where(Expense.user_id == user_id))
+    return list(result.scalars().all())
+
 # Trend Routes
 @get('/expenses/category')
 async def get_expenses_by_category(transaction: AsyncSession) -> list[dict[str, str | int]]:
@@ -253,7 +266,7 @@ db_config = SQLAlchemyAsyncConfig(
 app = Litestar(
     [register_user, login_access_token,
      get_my_expenses,
-    get_expenses, get_expense, create_expense, update_expense, delete_expense, get_expenses_by_category, get_expenses_by_month, get_users],
+    get_expenses, get_expense, create_expense, update_expense, delete_expense, get_expenses_by_category, get_expenses_by_month, get_users, get_user, get_all_user_expenses],
     dependencies={"transaction": Provide(provide_transaction),
                    "current_user": Provide(provide_user, use_cache=False)},
     plugins=[SQLAlchemyPlugin(db_config)],
