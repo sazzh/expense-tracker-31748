@@ -109,7 +109,20 @@ async def register_user(data: RegisterDTO, transaction: AsyncSession) -> User:
     )
     transaction.add(user)
     await transaction.flush()
-    return user
+
+    # create jwt so don't have to login after registering
+    expires_at = timedelta(minutes=30)
+    access_token = create_access_token(
+        data={"sub": data.username},
+        expires_delta=expires_at,
+    )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "username": data.username,
+        "role": user.role,
+    }
 
 # get token + login
 @post('/token')

@@ -1,9 +1,11 @@
 import { Box, Button, Group, Paper, PasswordInput, TextInput, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconUserPentagon, IconAsterisk } from "@tabler/icons-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export function RegisterPage() {
+  const navigate = useNavigate();
+  
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -30,7 +32,14 @@ export function RegisterPage() {
         body: JSON.stringify(json),
       });
       const data = await res.json();
-      // store user info and token in localStorage
+      if (res.ok) {
+        localStorage.setItem('token', data.access_token);
+        localStorage.setItem('username', data.username);
+        localStorage.setItem('role', data.role);
+        navigate('/');
+      } else {
+        alert(data.detail || "Login failed. Please check your credentials");
+      }
     } catch (err) {
       alert("Server connection error");
     }
