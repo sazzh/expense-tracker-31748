@@ -176,8 +176,14 @@ async def provide_user(request: Request, transaction: AsyncSession) -> User:
     
     return user
 
-# Expense Routes
+# Expense Routes - user
 @get('/expenses', return_dto=ReadDTO)
+async def get_my_expenses(transaction: AsyncSession, current_user: User) -> list[Expense]:
+    result = await transaction.execute(select(Expense).where(Expense.user_id == current_user.id))
+    return list(result.scalars().all())
+
+# Expense Routes - admin
+@get('/admin/expenses', return_dto=ReadDTO)
 async def get_expenses(transaction: AsyncSession) -> list[Expense]:
     result = await transaction.execute(select(Expense))
     return list(result.scalars().all())
@@ -213,7 +219,7 @@ async def delete_expense(expense_id: int, transaction: AsyncSession) -> None:
         raise NotFoundException(detail="Expense not found")
     await transaction.delete(expense)
 
-# Routes for trends
+# Trend Routes
 @get('/expenses/category')
 async def get_expenses_by_category(transaction: AsyncSession) -> list[dict[str, str | int]]:
     query = select(Expense.category, func.sum(Expense.amount_cents).label("total")).group_by(Expense.category)
@@ -241,6 +247,7 @@ db_config = SQLAlchemyAsyncConfig(
 
 app = Litestar(
     [register_user, login_access_token,
+     get_my_expenses,
     get_expenses, get_expense, create_expense, update_expense, delete_expense, get_expenses_by_category, get_expenses_by_month],
     dependencies={"transaction": Provide(provide_transaction),
                    "current_user": Provide(provide_user, use_cache=False)},

@@ -1,7 +1,12 @@
 import { type Expense } from "../types/Expense";
 
 export async function getExpenses(): Promise<Expense[]> {
-    const res = await fetch('/api/expenses');
+    const res = await fetch('/api/expenses', {
+        method: 'GET',
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
 
         if (!res.ok) {
           throw new Error(`Failed to fetch expenses: ${res.status} ${res.statusText}`);
