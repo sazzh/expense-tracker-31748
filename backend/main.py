@@ -94,7 +94,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 @post('/register', return_dto=UserDTO)
-async def register_user(data: RegisterDTO, transaction: AsyncSession) -> User:
+async def register_user(data: RegisterDTO, transaction: AsyncSession) -> dict[str, str]:
     if data.password != data.confirmPassword:
         raise HTTPException(status_code=400, detail="Passwords do not match")
 
