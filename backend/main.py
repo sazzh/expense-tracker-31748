@@ -1,9 +1,9 @@
 from collections.abc import AsyncGenerator
 from dataclasses import dataclass
-import datetime
+from datetime import timedelta, timezone, datetime, date
 from enum import Enum
 import os
-from typing import Optional
+from typing import Optional, cast
 from litestar import Litestar, delete, get, post, put
 from litestar.plugins.sqlalchemy import SQLAlchemyPlugin, SQLAlchemyAsyncConfig, base, SQLAlchemyDTO, SQLAlchemyDTOConfig
 from sqlalchemy.orm import Mapped, mapped_column
@@ -13,6 +13,11 @@ from sqlalchemy.exc import IntegrityError
 from collections.abc import AsyncGenerator, Sequence
 from litestar.exceptions import ClientException, HTTPException, NotFoundException
 import bcrypt
+import jwt
+from dotenv import load_dotenv
+
+load_dotenv()
+SECRET_KEY = cast(str, os.getenv("SECRET_KEY"))
 
 # Models
 class CategoryEnum(Enum):
@@ -25,7 +30,7 @@ class CategoryEnum(Enum):
 
 class Expense(base.BigIntBase):
     __tablename__ = "expenses"
-    date: Mapped[datetime.date] = mapped_column(Date)
+    date: Mapped[date] = mapped_column(Date)
     name: Mapped[str] = mapped_column(String(100))
     amount_cents: Mapped[int] = mapped_column(Integer)
     category: Mapped[CategoryEnum] = mapped_column(SqlEnum(CategoryEnum))
@@ -52,6 +57,11 @@ class RegisterDTO:
     password: str
     confirmPassword: str
 
+@dataclass
+class LoginDTO:
+    username: str
+    password: str
+
 # Setup database
 async def provide_transaction(db_session: AsyncSession) -> AsyncGenerator[AsyncSession, None]:
     try:
@@ -75,6 +85,14 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     hashed_bytes = hashed_password.encode("utf-8")
     return bcrypt.checkpw(pwd_bytes, hashed_bytes)
 
+# create token for login
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    payload = data.copy()
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=15))
+    payload.update({"exp": expire})
+    encoded_jwt = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+    return encoded_jwt
+
 @post('/register', return_dto=UserDTO)
 async def register_user(data: RegisterDTO, transaction: AsyncSession) -> User:
     if data.password != data.confirmPassword:
@@ -92,6 +110,30 @@ async def register_user(data: RegisterDTO, transaction: AsyncSession) -> User:
     transaction.add(user)
     await transaction.flush()
     return user
+
+# get token + login
+@post('/token')
+async def login_access_token(data: LoginDTO, transaction: AsyncSession) -> dict[str, str]:
+    user = await transaction.scalar(select(User).where(User.username == data.username))
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    if not verify_password(data.password, user.password):
+        raise HTTPException(status_code=401, detail="Incorrect username or password", headers={"WWW-Authenticate": "Bearer"})
+
+    # create JWT token
+    expires_at = timedelta(minutes=30)
+    access_token = create_access_token(
+        data={"sub": data.username},
+        expires_delta=expires_at,
+    )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "username": data.username,
+        "role": user.role,
+    }
 
 # Expense Routes
 @get('/expenses', return_dto=ReadDTO)
@@ -157,7 +199,7 @@ db_config = SQLAlchemyAsyncConfig(
 )
 
 app = Litestar(
-    [register_user,
+    [register_user, login_access_token,
     get_expenses, get_expense, create_expense, update_expense, delete_expense, get_expenses_by_category, get_expenses_by_month],
     dependencies={"transaction": provide_transaction},
     plugins=[SQLAlchemyPlugin(db_config)],

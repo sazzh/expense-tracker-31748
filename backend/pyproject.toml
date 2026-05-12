@@ -7,6 +7,7 @@ requires-python = ">=3.14"
 dependencies = [
     "aiosqlite>=0.22.1",
     "bcrypt>=5.0.0",
-    "litestar[sqlalchemy,standard]>=2.21.1",
+    "litestar[jwt,sqlalchemy,standard]>=2.21.1",
+    "python-dotenv>=1.2.2",
     "uvicorn[standard]>=0.42.0",
 ]
