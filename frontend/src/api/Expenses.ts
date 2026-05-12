@@ -1,4 +1,4 @@
-import { type Expense } from "../types/Expense";
+import { type CreateExpense, type Expense } from "../types/Expense";
 
 export async function getExpenses(): Promise<Expense[]> {
     const res = await fetch('/api/expenses', {
@@ -25,7 +25,7 @@ export async function getExpense(id: string): Promise<Expense> {
     return res.json();
 }
 
-export async function createExpense(data: Omit<Expense, 'id'>): Promise<Expense> {
+export async function createExpense(data: Omit<CreateExpense, 'id'>): Promise<Expense> {
     const res = await fetch('/api/expenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -39,7 +39,7 @@ export async function createExpense(data: Omit<Expense, 'id'>): Promise<Expense>
     return res.json();
 }
 
-export async function updateExpense(id: string, data: Omit<Expense, 'id'>): Promise<Expense> {
+export async function updateExpense(id: string, data: Omit<CreateExpense, 'id'>): Promise<Expense> {
     const res = await fetch(`/api/expenses/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

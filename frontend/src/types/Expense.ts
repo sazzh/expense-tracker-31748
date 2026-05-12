@@ -5,7 +5,18 @@ export type Expense = {
     amount_cents: number; // cents for best math conversion
     category: Category;
     description?: string | null;
+    created_at: string;
+    updated_at: string;
+    user_id: number;
 };
+
+export type CreateExpense = {
+    date: string;
+    name: string;
+    amount_cents: number; // cents for best math conversion
+    category: Category;
+    description?: string | null;
+}
 
 export const CATEGORIES = [
     "food",
