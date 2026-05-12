@@ -7,6 +7,7 @@ import { TrendsPage } from "./pages/Trends.page";
 import { LoginPage } from "./pages/Login.page";
 import { RegisterPage } from "./pages/Register.page";
 import { useSyncExternalStore } from "react";
+import { AdminPage } from "./pages/Admin.page";
 
 // recheck localStorage for token every time it is updated
 function subscribe(callback: () => void) {
@@ -18,9 +19,31 @@ function useAuth() {
   return useSyncExternalStore(subscribe, () => Boolean(localStorage.getItem("token")));
 }
 
+function useRole() {
+  return useSyncExternalStore(subscribe, () => localStorage.getItem("role"));
+}
+
+// routes for only logged in users
 function ProtectedRoute() {
   const isAuthenticated = useAuth();
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />
+}
+
+// routes for only admin users
+function AdminRoute() {
+  const isAuthenticated = useAuth();
+  const role = useRole();
+
+  if (!isAuthenticated) {
+    return <Navigate to='/login' replace />
+  }
+
+  if (role !== "admin") {
+    alert("You do not have permission to view this page")
+    return <Navigate to='/' replace />
+  }
+
+  return <Outlet />;
 }
 
 function ShellRoute() {
@@ -62,7 +85,16 @@ const router = createBrowserRouter([
             element: <TrendsPage />
           }
         ]
-      }
+      },
+      {
+        element: <AdminRoute />,
+        children: [
+          {
+            path: '/admin-dashboard',
+            element: <AdminPage />
+          },
+        ]
+      },
     ]
   },
 ]);
