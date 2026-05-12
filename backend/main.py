@@ -4,14 +4,15 @@ from datetime import timedelta, timezone, datetime, date
 from enum import Enum
 import os
 from typing import Optional, cast
-from litestar import Litestar, delete, get, post, put
+from litestar import Litestar, Request, delete, get, post, put
 from litestar.plugins.sqlalchemy import SQLAlchemyPlugin, SQLAlchemyAsyncConfig, base, SQLAlchemyDTO, SQLAlchemyDTOConfig
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer, String, Date, Enum as SqlEnum, func, select, inspect
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Date, Enum as SqlEnum, func, select, inspect
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from collections.abc import AsyncGenerator, Sequence
 from litestar.exceptions import ClientException, HTTPException, NotFoundException
+from litestar.di import Provide
 import bcrypt
 import jwt
 from dotenv import load_dotenv
@@ -35,9 +36,12 @@ class Expense(base.BigIntBase):
     amount_cents: Mapped[int] = mapped_column(Integer)
     category: Mapped[CategoryEnum] = mapped_column(SqlEnum(CategoryEnum))
     description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.current_timestamp())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.current_timestamp(), onupdate=func.current_timestamp())
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
 class ReadDTO(SQLAlchemyDTO[Expense]):
-    config = SQLAlchemyDTOConfig(include={"id", "date", "name", "amount_cents", "category", "description"})
+    config = SQLAlchemyDTOConfig(include={"id", "date", "name", "amount_cents", "category", "description", "created_at", "updated_at", "user_id"})
 
 class WriteDTO(SQLAlchemyDTO[Expense]):
     config = SQLAlchemyDTOConfig(exclude={"id"})
@@ -148,6 +152,30 @@ async def login_access_token(data: LoginDTO, transaction: AsyncSession) -> dict[
         "role": user.role,
     }
 
+# To get user to associate with expenses
+async def provide_user(request: Request, transaction: AsyncSession) -> User:
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing access token")
+    
+    token = auth_header.split(" ")[1]
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        username = payload.get("sub")
+        if not username:
+            raise HTTPException(status_code=401, detail="Invalid token payload")
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Expired token")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    user = await transaction.scalar(select(User).where(User.username == username))
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    return user
+
 # Expense Routes
 @get('/expenses', return_dto=ReadDTO)
 async def get_expenses(transaction: AsyncSession) -> list[Expense]:
@@ -214,7 +242,8 @@ db_config = SQLAlchemyAsyncConfig(
 app = Litestar(
     [register_user, login_access_token,
     get_expenses, get_expense, create_expense, update_expense, delete_expense, get_expenses_by_category, get_expenses_by_month],
-    dependencies={"transaction": provide_transaction},
+    dependencies={"transaction": Provide(provide_transaction),
+                   "current_user": Provide(provide_user, use_cache=False)},
     plugins=[SQLAlchemyPlugin(db_config)],
     debug=True,
 )
