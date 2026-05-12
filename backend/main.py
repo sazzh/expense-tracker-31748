@@ -253,7 +253,7 @@ db_config = SQLAlchemyAsyncConfig(
 app = Litestar(
     [register_user, login_access_token,
      get_my_expenses,
-    get_expenses, get_expense, create_expense, update_expense, delete_expense, get_expenses_by_category, get_expenses_by_month],
+    get_expenses, get_expense, create_expense, update_expense, delete_expense, get_expenses_by_category, get_expenses_by_month, get_users],
     dependencies={"transaction": Provide(provide_transaction),
                    "current_user": Provide(provide_user, use_cache=False)},
     plugins=[SQLAlchemyPlugin(db_config)],
