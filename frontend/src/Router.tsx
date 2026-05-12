@@ -9,6 +9,7 @@ import { RegisterPage } from "./pages/Register.page";
 import { useSyncExternalStore } from "react";
 import { AdminPage } from "./pages/Admin.page";
 import { UserActivityPage } from "./pages/UserActivity.page";
+import { UserPage } from "./pages/User.page";
 
 // recheck localStorage for token every time it is updated
 function subscribe(callback: () => void) {
@@ -94,10 +95,10 @@ const router = createBrowserRouter([
             path: '/admin-dashboard',
             element: <AdminPage />
           },
-          // {
-          //   path: '/users/:id',
-          //   element:
-          // },
+          {
+            path: '/admin/users/:id',
+            element: <UserPage />
+          },
           {
             path: '/admin/users/:id/expenses',
             element: <UserActivityPage />
