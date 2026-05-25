@@ -25,7 +25,6 @@ export default function ExpenseFilters({ search, category, onSearchChange, onCat
         clearable
         searchable
         hidePickedOptions
-        maxValues={3}
         
         data={CATEGORIES.map((category) => ({ 
           label: category.charAt(0).toUpperCase() + category.slice(1), 
