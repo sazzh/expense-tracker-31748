@@ -1,9 +1,10 @@
-import { Box, Button, Group, NumberInput, Select, Textarea, TextInput } from "@mantine/core";
+import { Alert, Box, Button, Group, NumberInput, Select, Textarea, TextInput } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { CATEGORIES, type Category, type Expense } from "../types/Expense";
-import { IconCalendarWeek, IconCaretDown, IconCategory2 } from '@tabler/icons-react';
+import { IconAlertCircle, IconCalendarWeek, IconCaretDown, IconCategory2, IconCheck } from '@tabler/icons-react';
 import { createExpense, updateExpense } from "../api/Expenses";
+import { useState } from "react";
 
 type ExpenseFormProps = {
   expense?: Expense;
@@ -11,6 +12,9 @@ type ExpenseFormProps = {
 }
 
 export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
+  const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [loading, setLoading] = useState(false);
+
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -29,27 +33,49 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
   });
 
   const handleSubmit = async () => {
-    const vals = form.getValues();
+    setLoading(true);
 
-    const body = {
-      name: vals.name.trim(),
-      amount_cents: Math.round(Number(vals.amount) * 100), // convert dollars to cents
-      date: vals.date,
-      category: vals.category as Category,
-      description: vals.description.trim() || undefined,
+    try {
+      const vals = form.getValues();
+      const body = {
+        name: vals.name.trim(),
+        amount_cents: Math.round(Number(vals.amount) * 100), // convert dollars to cents
+        date: vals.date,
+        category: vals.category as Category,
+        description: vals.description.trim() || undefined,
+      }
+
+      if (expense) {
+        await updateExpense(expense.id, body);
+        setStatus({ type: 'success', message: 'Expense updated successfully.' });
+      } else {
+        await createExpense(body);
+        setStatus({ type: 'success', message: 'Expense created successfully.' });
+      }
+
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (err) {
+      setStatus({ type: 'error', message: expense ? 'Failed to update expense' : 'Failed to create new expense' });
+    } finally {
+      setLoading(false);
     }
-
-    if (expense) {
-      await updateExpense(expense.id, body);
-    } else {
-      await createExpense(body);
-    }
-
-    onSuccess?.();
   };
 
   return (
     <Box mx="auto" maw="800">
+      {status && (
+        <Alert
+        icon={status.type === 'success' ? <IconCheck size={16} /> : <IconAlertCircle size={16} />}
+        color={status.type === 'success' ? 'green' : 'red'}
+        mb="md"
+        withCloseButton
+        onClose={() => setStatus(null)}
+      >
+        {status.message}
+      </Alert>
+      )}
     <form onSubmit={form.onSubmit(() => handleSubmit())}>
       <Group align="baseline" grow>
       <TextInput
@@ -108,7 +134,7 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
         {...form.getInputProps('description')}
       />
       <Group className="btn">
-        <Button c="black" type="submit">Submit</Button>
+        <Button c="black" type="submit" loading={loading}>Submit</Button>
       </Group>
     </form>
     </Box>
