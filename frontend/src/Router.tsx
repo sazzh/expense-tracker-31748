@@ -17,7 +17,22 @@ function subscribe(callback: () => void) {
 }
 
 function useAuth() {
-  return useSyncExternalStore(subscribe, () => Boolean(localStorage.getItem("token")));
+  return useSyncExternalStore(subscribe,
+    () => {
+      const token = localStorage.getItem("token");
+      if (!token) return false;
+
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const expired = payload.exp * 1000 < Date.now();
+
+      if (expired) {
+        localStorage.removeItem("token");
+        return false;
+      }
+
+      return true;
+    }
+  );
 }
 
 function useRole() {
