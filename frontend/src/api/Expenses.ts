@@ -16,7 +16,12 @@ export async function getExpenses(): Promise<Expense[]> {
 }
 
 export async function getExpense(id: string): Promise<Expense> {
-    const res = await fetch(`/api/expenses/${id}`);
+    const res = await fetch(`/api/expenses/${id}`, {
+        method: 'GET',
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
 
     if (!res.ok) {
         throw new Error(`Failed to fetch expense: ${res.status} ${res.statusText}`);
@@ -28,7 +33,10 @@ export async function getExpense(id: string): Promise<Expense> {
 export async function createExpense(data: Omit<CreateExpense, 'id'>): Promise<Expense> {
     const res = await fetch('/api/expenses', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
         body: JSON.stringify(data)
     })
 
@@ -42,7 +50,10 @@ export async function createExpense(data: Omit<CreateExpense, 'id'>): Promise<Ex
 export async function updateExpense(id: string, data: Omit<CreateExpense, 'id'>): Promise<Expense> {
     const res = await fetch(`/api/expenses/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
         body: JSON.stringify(data)
     })
 
@@ -55,7 +66,10 @@ export async function updateExpense(id: string, data: Omit<CreateExpense, 'id'>)
 
 export async function deleteExpense(id: string): Promise<void> {
     const res = await fetch(`/api/expenses/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
     }); 
 
     if (!res.ok) {
@@ -66,7 +80,12 @@ export async function deleteExpense(id: string): Promise<void> {
 }
 
 export async function getExpensesByCategory(): Promise<{ category: string, total: number }[]> {
-    const res = await fetch('/api/expenses/category');
+    const res = await fetch('/api/expenses/category', {
+        method: 'GET',
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
 
     if (!res.ok) {
         throw new Error(`Failed to fetch expenses by category: ${res.status} ${res.statusText}`);
@@ -76,7 +95,12 @@ export async function getExpensesByCategory(): Promise<{ category: string, total
 }
 
 export async function getExpensesByMonth(): Promise<{ month: string, total: number }[]> {
-    const res = await fetch('/api/expenses/month');
+    const res = await fetch('/api/expenses/month', {
+        method: 'GET',
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
 
     if (!res.ok) {
         throw new Error(`Failed to fetch expenses by month: ${res.status} ${res.statusText}`);

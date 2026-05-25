@@ -60,8 +60,13 @@ class Expense(base.BigIntBase):
 class ReadDTO(SQLAlchemyDTO[Expense]):
     config = SQLAlchemyDTOConfig(include={"id", "date", "name", "amount", "category", "description", "created_at", "updated_at", "user_id"})
 
-class WriteDTO(SQLAlchemyDTO[Expense]):
-    config = SQLAlchemyDTOConfig(exclude={"id"})
+@dataclass
+class ExpenseWriteDTO:
+    date: date
+    name: str
+    amount: float
+    category: CategoryEnum
+    description: Optional[str] = None
 
 class User(base.BigIntBase):
     __tablename__ = "users"
@@ -209,6 +214,44 @@ async def get_my_expenses(transaction: AsyncSession, current_user: User) -> list
     result = await transaction.execute(select(Expense).where(Expense.user_id == current_user.id))
     return list(result.scalars().all())
 
+@post('/expenses', return_dto=ReadDTO)
+async def create_expense(data: ExpenseWriteDTO, transaction: AsyncSession, current_user: User) -> Expense:
+    expense = Expense(
+        date = data.date,
+        name = data.name,
+        category = data.category,
+        description = data.description,
+        user_id = current_user.id
+    )
+    expense.amount = data.amount # hybrid setter
+    transaction.add(expense)
+    await transaction.flush()
+    return expense
+
+@put('/expenses/{expense_id:int}', return_dto=ReadDTO)
+async def update_expense(expense_id: int, data: ExpenseWriteDTO, transaction: AsyncSession, current_user: User) -> Expense:
+    expense = await transaction.get(Expense, expense_id)
+    if not expense:
+        raise NotFoundException(detail="Expense not found")
+    if expense.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorised to update this expense")
+    
+    expense.date = data.date
+    expense.name = data.name
+    expense.amount = data.amount
+    expense.category = data.category
+    expense.description = data.description
+    return expense
+
+@delete('/expenses/{expense_id:int}')
+async def delete_expense(expense_id: int, transaction: AsyncSession, current_user: User) -> None:
+    expense = await transaction.get(Expense, expense_id)
+    if not expense:
+        raise NotFoundException(detail="Expense not found")
+    if expense.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorised to delete this expense")
+    await transaction.delete(expense)
+
 # Expense Routes - admin
 @get('/admin/expenses', return_dto=ReadDTO)
 async def get_expenses(transaction: AsyncSession) -> list[Expense]:
@@ -222,29 +265,6 @@ async def get_expense(expense_id: int, transaction: AsyncSession) -> Expense:
     if not expense:
         raise NotFoundException(detail="Expense not found")
     return expense
-
-@post('/expenses', dto=WriteDTO, return_dto=ReadDTO)
-async def create_expense(data: Expense, transaction: AsyncSession) -> Expense:
-    transaction.add(data)
-    await transaction.flush()
-    return data
-
-@put('/expenses/{expense_id:int}', dto=WriteDTO, return_dto=ReadDTO)
-async def update_expense(expense_id: int, data: Expense, transaction: AsyncSession) -> Expense:
-    expense = await transaction.get(Expense, expense_id)
-    if not expense:
-        raise NotFoundException(detail="Expense not found")
-    for key, value in data.__dict__.items():
-        if key != "id" and not key.startswith("_"):
-            setattr(expense, key, value)
-    return expense
-
-@delete('/expenses/{expense_id:int}')
-async def delete_expense(expense_id: int, transaction: AsyncSession) -> None:
-    expense = await transaction.get(Expense, expense_id)
-    if not expense:
-        raise NotFoundException(detail="Expense not found")
-    await transaction.delete(expense)
 
 @get('/admin/users', return_dto=UserDTO)
 async def get_users(transaction: AsyncSession) -> list[User]:
