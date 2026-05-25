@@ -6,6 +6,7 @@ import os
 from typing import Optional, cast
 from litestar import Litestar, Request, delete, get, post, put
 from litestar.plugins.sqlalchemy import SQLAlchemyPlugin, SQLAlchemyAsyncConfig, base, SQLAlchemyDTO, SQLAlchemyDTOConfig
+from litestar.config.cors import CORSConfig
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Date, Enum as SqlEnum, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,6 +21,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 SECRET_KEY = cast(str, os.getenv("SECRET_KEY"))
+
+cors_config = CORSConfig(
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+    allow_credentials=True,
+)
 
 # Models
 class CategoryEnum(Enum):
@@ -293,4 +301,5 @@ app = Litestar(
                    "current_user": Provide(provide_user, use_cache=False)},
     plugins=[SQLAlchemyPlugin(db_config)],
     debug=True,
+    cors_config=cors_config,
 )
