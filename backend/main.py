@@ -57,7 +57,7 @@ class WriteDTO(SQLAlchemyDTO[Expense]):
 
 class User(base.BigIntBase):
     __tablename__ = "users"
-    username: Mapped[str] = mapped_column(String(100), unique=True)
+    username: Mapped[str] = mapped_column(String(100, collation="NOCASE"), unique=True)
     password: Mapped[str] = mapped_column(String(50))
     role: Mapped[str] = mapped_column(String(20), default="user") # user or admin
     expenses: Mapped[list["Expense"]] = relationship("Expense", cascade="all, delete-orphan", lazy="selectin")
@@ -109,15 +109,17 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 @post('/register', return_dto=UserDTO)
 async def register_user(data: RegisterDTO, transaction: AsyncSession) -> dict[str, str]:
+    username = data.username.strip().lower()
+
     if data.password != data.confirmPassword:
         raise HTTPException(status_code=400, detail="Passwords do not match")
 
-    existing_user = await transaction.scalar(select(User).where(User.username == data.username))
+    existing_user = await transaction.scalar(select(User).where(User.username == username))
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
         
     user = User(
-        username=data.username,
+        username=username,
         password=get_password_hash(data.password),
         role="user",
     )
@@ -127,21 +129,23 @@ async def register_user(data: RegisterDTO, transaction: AsyncSession) -> dict[st
     # create jwt so don't have to login after registering
     expires_at = timedelta(minutes=30)
     access_token = create_access_token(
-        data={"sub": data.username},
+        data={"sub": username},
         expires_delta=expires_at,
     )
 
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "username": data.username,
+        "username": username,
         "role": user.role,
     }
 
 # get token + login
 @post('/token')
 async def login_access_token(data: LoginDTO, transaction: AsyncSession) -> dict[str, str]:
-    user = await transaction.scalar(select(User).where(User.username == data.username))
+    username = data.username.strip().lower()
+
+    user = await transaction.scalar(select(User).where(User.username == username))
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
     
@@ -151,14 +155,14 @@ async def login_access_token(data: LoginDTO, transaction: AsyncSession) -> dict[
     # create JWT token
     expires_at = timedelta(minutes=30)
     access_token = create_access_token(
-        data={"sub": data.username},
+        data={"sub": username},
         expires_delta=expires_at,
     )
 
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "username": data.username,
+        "username": username,
         "role": user.role,
     }
 
