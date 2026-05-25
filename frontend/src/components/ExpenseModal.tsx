@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Modal, LoadingOverlay, Button, Group } from "@mantine/core";
+import { Modal, LoadingOverlay, Button, Stack } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 import ExpenseForm from "./ExpenseForm";
 import type { Expense } from "../types/Expense";
 import { getExpense } from "../api/Expenses";
+import { ExpenseDetails } from "./ExpenseDetails";
 
 interface ExpenseModalProps {
   expenseId: string;
@@ -41,15 +42,13 @@ export default function ExpenseModal({ expenseId, opened, onClose, initialMode =
       {expense && (
         <>
           {mode === "view" && (
-            <Group justify="flex-end" mb="sm">
-              <Button
-                leftSection={<IconEdit size={16} />}
-                variant="light"
-                onClick={() => setMode("edit")}
-              >
-                Edit
+            <Stack>
+              <ExpenseDetails expense={expense} />
+              <Button leftSection={<IconEdit />} c="black" w="fit-content" mx="auto" mt="md"
+                onClick={() => setMode("edit")}>
+                  Edit
               </Button>
-            </Group>
+            </Stack>
           )}
 
           {mode === "edit" && (

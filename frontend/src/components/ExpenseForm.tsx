@@ -4,7 +4,6 @@ import { useForm } from "@mantine/form";
 import { CATEGORIES, type Category, type Expense } from "../types/Expense";
 import { IconCalendarWeek, IconCaretDown, IconCategory2 } from '@tabler/icons-react';
 import { createExpense, updateExpense } from "../api/Expenses";
-import { useNavigate } from "react-router";
 
 type ExpenseFormProps = {
   expense?: Expense;
