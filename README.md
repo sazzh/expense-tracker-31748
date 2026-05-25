@@ -32,6 +32,17 @@ npm run dev
 ```
 4. Navigate to `http://localhost:5173` and have fun!
 
+## Pre-Configured Users
+Users can sign up through the webpage.  
+Admins can only be added through the database.  
+
+Logins of both roles are below for example usage of the application.
+
+| Role    | Username  | Password    |
+|---------|-----------|-------------|
+| User    | `user`    | `password`  |
+| Admin   | `admin`   | `admin`     |
+
 ## Tech Stack
 <!-- illustration of technical stack, including frontend, styling, routing, data, and deployment (if applicable) -->
 - Frontend: HTML/CSS, React with TypeScript, styled with Mantine UI, React Router for client-side navigation  
