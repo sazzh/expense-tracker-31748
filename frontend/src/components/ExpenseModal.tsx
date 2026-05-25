@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Modal, LoadingOverlay, Button, Stack } from "@mantine/core";
-import { IconEdit } from "@tabler/icons-react";
+import { Modal, LoadingOverlay, Button, Stack, Center, Alert } from "@mantine/core";
+import { IconAlertCircle, IconEdit } from "@tabler/icons-react";
 import ExpenseForm from "./ExpenseForm";
 import type { Expense } from "../types/Expense";
 import { getExpense } from "../api/Expenses";
@@ -16,6 +16,7 @@ interface ExpenseModalProps {
 export default function ExpenseModal({ expenseId, opened, onClose, initialMode = "view" }: ExpenseModalProps) {
   const [expense, setExpense] = useState<Expense | null>(null);
   const [mode, setMode] = useState<"view" | "edit">(initialMode);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!opened) return;
@@ -23,8 +24,12 @@ export default function ExpenseModal({ expenseId, opened, onClose, initialMode =
     setMode(initialMode);
     
     const fetch = async () => {
-      const data = await getExpense(expenseId);
-      setExpense(data);
+      try {
+        const data = await getExpense(expenseId);
+        setExpense(data);
+      } catch {
+        setError("Failed to load expense. Please try again later.");
+      }
     };
     
     fetch();
@@ -37,7 +42,14 @@ export default function ExpenseModal({ expenseId, opened, onClose, initialMode =
       title={mode === "edit" ? "Edit Expense" : "Expense Details"}
       size="md"
     >
-      <LoadingOverlay visible={!expense} />
+      <LoadingOverlay visible={!expense && !error} />
+      {error && (
+        <Center>
+          <Alert icon={<IconAlertCircle size={16} />} color="red" maw={500}>
+            {error}
+          </Alert>
+        </Center>
+      )}
 
       {expense && (
         <>
