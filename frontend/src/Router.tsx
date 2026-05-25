@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from "react-router-dom";
 import { HomePage } from "./pages/Home.page";
-import AppShellLayout from "./components/AppLayout";
+import AppShellLayout from "./components/AppShellLayout";
 import { AddExpensePage } from "./pages/AddExpense.page";
 import { TrendsPage } from "./pages/Trends.page";
 import { LoginPage } from "./pages/Login.page";
