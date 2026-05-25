@@ -1,14 +1,17 @@
-import { Box, Divider, Group, Paper, Text } from "@mantine/core";
+import { Alert, Box, Center, Divider, Group, Loader, Paper, Text } from "@mantine/core";
 import BackButton from "../components/BackButton";
 import { useEffect, useState } from "react";
 import { getExpensesByCategory, getExpensesByMonth } from "../api/Expenses";
 import { type MonthlyExpenses, type CategoryTotal } from "../types/Trends";
 import CategoryDonutChart from "../components/CategoryDonutChart";
 import ExpenseBarChart from "../components/ExpensesBarChart";
+import { IconAlertCircle } from "@tabler/icons-react";
 
 export function TrendsPage() {
   const [byCategory, setByCategory] = useState<CategoryTotal[]>([]);
   const [byMonth, setByMonth] = useState<MonthlyExpenses[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTrends = async () => {
@@ -21,7 +24,9 @@ export function TrendsPage() {
         setByMonth(monthlyTrend)
 
       } catch (error) {
-        console.error("Error fetching trends:", error);
+        setError("Failed to load trends. Please try again later.");
+      } finally {
+        setLoading(false);
       }
     };
     fetchTrends();  
@@ -36,18 +41,35 @@ export function TrendsPage() {
         <Text c="dimmed" size="sm" ml="lg" mb="lg" ta="center">Here you can view your spending patterns by 
           category as well as monthly expenditure trends.</Text>
       </Box>
-      <Group justify="center" gap={50}>
-        <Paper shadow="sm" px="100" py="md" radius="md" withBorder h={470}>
-          <CategoryDonutChart byCategory={byCategory} />
-        </Paper>
-        <Paper shadow="sm" px="100" py="md" radius="md" withBorder h={470}>
-          <ExpenseBarChart byMonth={byMonth} />
-          <Divider />
-          <Text size="sm" ta="center" mt="xs">
-            Total across all months: ${(byMonth.reduce((sum, month) => sum + Number(month.total), 0)).toFixed(2)}
-          </Text>
-        </Paper>
-      </Group>
+
+      {loading && (
+        <Center h={470}>
+          <Loader />
+        </Center>
+      )}
+
+      {error && (
+        <Center>
+          <Alert icon={<IconAlertCircle size={16} />} color="red" maw={500}>
+            {error}
+          </Alert>
+        </Center>
+      )}
+
+      {!loading && !error && (
+        <Group justify="center" gap={50}>
+          <Paper shadow="sm" px="100" py="md" radius="md" withBorder h={470}>
+            <CategoryDonutChart byCategory={byCategory} />
+          </Paper>
+          <Paper shadow="sm" px="100" py="md" radius="md" withBorder h={470}>
+            <ExpenseBarChart byMonth={byMonth} />
+            <Divider />
+            <Text size="sm" ta="center" mt="xs">
+              Total across all months: ${(byMonth.reduce((sum, month) => sum + Number(month.total), 0)).toFixed(2)}
+            </Text>
+          </Paper>
+        </Group>
+      )}
     </>
-  )
+  );
 }
