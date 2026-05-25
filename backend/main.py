@@ -6,7 +6,7 @@ import os
 from typing import Optional, cast
 from litestar import Litestar, Request, delete, get, post, put
 from litestar.plugins.sqlalchemy import SQLAlchemyPlugin, SQLAlchemyAsyncConfig, base, SQLAlchemyDTO, SQLAlchemyDTOConfig
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Date, Enum as SqlEnum, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
@@ -60,6 +60,7 @@ class User(base.BigIntBase):
     username: Mapped[str] = mapped_column(String(100), unique=True)
     password: Mapped[str] = mapped_column(String(50))
     role: Mapped[str] = mapped_column(String(20), default="user") # user or admin
+    expenses: Mapped[list["Expense"]] = relationship("Expense", cascade="all, delete-orphan", lazy="selectin")
 
 class UserDTO(SQLAlchemyDTO[User]):
     config = SQLAlchemyDTOConfig(exclude={"password"})
@@ -246,6 +247,14 @@ async def get_all_user_expenses(user_id: int, transaction: AsyncSession) -> list
     result = await transaction.execute(select(Expense).where(Expense.user_id == user_id))
     return list(result.scalars().all())
 
+@delete('/admin/users/{user_id:int}')
+async def delete_user(user_id: int, transaction: AsyncSession) -> None:
+    result = await transaction.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise NotFoundException(detail="User not found")
+    await transaction.delete(user)
+
 # Trend Routes
 @get('/expenses/category')
 async def get_expenses_by_category(transaction: AsyncSession) -> list[dict[str, str | int]]:
@@ -273,7 +282,7 @@ db_config = SQLAlchemyAsyncConfig(
 )
 
 app = Litestar(
-    [register_user, login_access_token,
+    [register_user, login_access_token, delete_user,
      get_my_expenses,
     get_expenses, get_expense, create_expense, update_expense, delete_expense, get_expenses_by_category, get_expenses_by_month, get_users, get_user, get_all_user_expenses],
     dependencies={"transaction": Provide(provide_transaction),

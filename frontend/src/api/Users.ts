@@ -45,3 +45,13 @@ export async function getUserExpenses(userId: string): Promise<Expense[]> {
 
   return res.json()
 }
+
+export async function deleteUser(userId: string) {
+  const res = await fetch(`/api/admin/users/${userId}`, {
+    method: 'DELETE',
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to delete user: ${res.status} ${res.statusText}`);
+  }
+}

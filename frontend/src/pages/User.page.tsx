@@ -1,16 +1,21 @@
-import { Box, Button, Group, Paper, Text } from "@mantine/core";
+import { Alert, Box, Button, Group, Paper, Text } from "@mantine/core";
 import { useNavigate, useParams } from "react-router";
 import { getUser, getUserExpenses } from "../api/Users";
 import { useEffect, useState } from "react";
 import type { User } from "../types/User";
 import type { Expense } from "../types/Expense";
 import BackButton from "../components/BackButton";
+import { useDeleteUser } from "../hooks/useDeleteUser";
+import { IconAlertCircle } from "@tabler/icons-react";
 
 export function UserPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [user, setUser] = useState<User>();
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { handleDelete } = useDeleteUser();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -20,15 +25,24 @@ export function UserPage() {
         setUser(user);
         setExpenses(expenses);
       } catch (err) {
-        console.log(err);
+        setError("Failed to load user, please try again");
       } finally {
-        console.log("implement loading status");
+        setLoading(false);
       }
     };
     fetchUsers();
   }, [id]);
 
-  if (!user) {
+  async function onDelete() {
+    const ok = await handleDelete(user!);
+    if (ok) {
+      navigate('/admin-dashboard')
+    }
+  }
+
+  const totalSpent = expenses.reduce((sum, e) => sum + e.amount, 0);
+
+  if (loading) {
     return (
       <Box p="xl">
         <Text>Loading...</Text>
@@ -36,7 +50,28 @@ export function UserPage() {
     );
   }
 
-  const totalSpent = expenses.reduce((sum, e) => sum + e.amount, 0);
+  if (error) {
+    return (
+      <>
+      <Alert icon={<IconAlertCircle size={16} />} color="red">
+        {error}
+      </Alert>
+      <Button c="black" mt="md" onClick={() => navigate('/admin-dashboard')}>
+        Return
+      </Button>
+      </>
+    );
+  }
+
+  if (!user) {
+    return (
+      <>
+      <Alert icon={<IconAlertCircle size={16} />} color="red">
+        User not found
+      </Alert>
+      </>
+    );
+  }
 
   return (
     <>
@@ -60,7 +95,7 @@ export function UserPage() {
           <Button variant="light">
             Edit Details
           </Button>
-          <Button variant="light" color="red">
+          <Button onClick={onDelete} variant="light" color="red">
             Delete User
           </Button>
         </Group>

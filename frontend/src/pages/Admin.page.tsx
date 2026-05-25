@@ -1,14 +1,17 @@
-import { ActionIcon, Box, Button, Group, Text } from "@mantine/core";
+import { ActionIcon, Alert, Box, Button, Center, Group, Loader, Text } from "@mantine/core";
 import { useNavigate } from "react-router";
 import { getUsers } from "../api/Users";
 import { useEffect, useState } from "react";
 import type { User } from "../types/User";
-import { IconTrash } from "@tabler/icons-react";
-import BackButton from "../components/BackButton";
+import { IconAlertCircle, IconTrash } from "@tabler/icons-react"; 
+import { useDeleteUser } from "../hooks/useDeleteUser";
 
 export function AdminPage() {
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { handleDelete } = useDeleteUser();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -16,27 +19,36 @@ export function AdminPage() {
         const data: User[] = await getUsers();
         setUsers(data);
       } catch (err) {
-        console.log(err);
+        setError("Failed to load users. Please try again later.");
       } finally {
-        console.log("implement loading status");
+        setLoading(false);
       }
     };
     fetchUsers();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this expense?")) { return }
-    // await deleteUser(id); TO DO
-    setUsers(users.filter(user => user.id !== id));
+  async function onDelete(user: User) {
+    const ok = await handleDelete(user);
+    if (ok) {
+      setUsers(prev => prev.filter(u => u.id !== user.id));
+    }
   }
 
   return (
     <>
       <Box mx="auto" w="100%" maw="1050" p="sm">
-        <BackButton />
         <h1 className="title">Expense Tracker Activity</h1>
         <Text c="dimmed" size="sm" ml="lg">View all users accounts and their activity.</Text>
 
+        {loading && <Center mt="xl"><Loader /></Center>}
+
+        {error && (
+          <Alert icon={<IconAlertCircle size={16} />} color="red">
+            {error}
+          </Alert>
+        )}
+
+        {!loading && !error && (
         <Box mt="lg">
           {users.map(user => (
             <Box key={user.id} p="xs" mb="sm" style={{ border: "2px solid #eee", borderRadius: 12 }}>
@@ -53,7 +65,7 @@ export function AdminPage() {
                     Manage Account
                   </Button>
                   <ActionIcon variant="subtle" aria-label="Delete Expense"
-                    onClick={() => handleDelete(user.id)}>
+                    onClick={() => onDelete(user)}>
                     <IconTrash stroke={1.25} color="var(--danger)" />
                   </ActionIcon>
                 </Group>
@@ -61,6 +73,7 @@ export function AdminPage() {
             </Box>
           ))}
         </Box>
+        )}
       </Box>
     </>
   )
