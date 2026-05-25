@@ -80,19 +80,19 @@ export function UserPage() {
         <h1 className="title">Manage {user.username}</h1>
         <Paper shadow="sm" radius="md" pl="md" withBorder>
           <h3 style={{ marginBottom: '0.5rem' }}>User Details</h3>
-          <Text c="dimmed" size="sm" ml="md" mt={0}>Username: {user.username}.</Text>
-          <Text c="dimmed" size="sm" ml="md">User ID: {user.id}.</Text>
-          <Text c="dimmed" size="sm" ml="md">Role: {user.role}.</Text>
+          <Text c="dimmed" size="sm" ml="md" mt={0}>Username: {user.username}</Text>
+          <Text c="dimmed" size="sm" ml="md">User ID: {user.id}</Text>
+          <Text c="dimmed" size="sm" ml="md">Role: {user.role}</Text>
           <h3 style={{ marginBottom: '0.5rem' }}>Expense Summary</h3>
-          <Text c="dimmed" size="sm" ml="md">Total expenses: {expenses.length}.</Text>
-          <Text c="dimmed" size="sm" ml="md" mb="lg">Total spent: ${(totalSpent).toFixed(2)}.</Text>
+          <Text c="dimmed" size="sm" ml="md">Total expenses: {expenses.length}</Text>
+          <Text c="dimmed" size="sm" ml="md" mb="lg">Total spent: ${(totalSpent).toFixed(2)}</Text>
 
         </Paper>
         <Group mt="lg">
           <Button variant="light" color="gray" onClick={() => navigate(`/admin/users/${user.id}/expenses`)}>
             View Activity
           </Button>
-          <Button variant="light">
+          <Button onClick={() => navigate(`/admin/users/${user.id}/edit`)} variant="light">
             Edit Details
           </Button>
           <Button onClick={onDelete} variant="light" color="red">

@@ -84,6 +84,11 @@ class LoginDTO:
     username: str
     password: str
 
+@dataclass
+class UpdateUserDTO:
+    username: str
+    role: str
+
 # Setup database
 async def provide_transaction(db_session: AsyncSession) -> AsyncGenerator[AsyncSession, None]:
     try:
@@ -259,6 +264,23 @@ async def get_all_user_expenses(user_id: int, transaction: AsyncSession) -> list
     result = await transaction.execute(select(Expense).where(Expense.user_id == user_id))
     return list(result.scalars().all())
 
+@put('/admin/users/{user_id:int}', return_dto=UserDTO)
+async def update_user(user_id: int, data: UpdateUserDTO, transaction: AsyncSession) -> User:
+    username = data.username.strip().lower()
+
+    existing = await transaction.scalar(select(User).where(User.username == username, User.id != user_id))
+    if existing:
+        raise HTTPException(status_code=400, detail="Username already exists")
+    
+    user = await transaction.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user.username = username
+    user.role = data.role
+    await transaction.flush()
+    return user
+
 @delete('/admin/users/{user_id:int}')
 async def delete_user(user_id: int, transaction: AsyncSession) -> None:
     result = await transaction.execute(select(User).where(User.id == user_id))
@@ -294,7 +316,7 @@ db_config = SQLAlchemyAsyncConfig(
 )
 
 app = Litestar(
-    [register_user, login_access_token, delete_user,
+    [register_user, login_access_token, delete_user, update_user,
      get_my_expenses,
     get_expenses, get_expense, create_expense, update_expense, delete_expense, get_expenses_by_category, get_expenses_by_month, get_users, get_user, get_all_user_expenses],
     dependencies={"transaction": Provide(provide_transaction),

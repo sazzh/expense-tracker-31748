@@ -46,6 +46,22 @@ export async function getUserExpenses(userId: string): Promise<Expense[]> {
   return res.json()
 }
 
+export async function updateUser(userId: string, body: { username: string, role: string }) {
+  const res = await fetch(`/api/admin/users/${userId}`, {
+    method: 'PUT',
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to update user: ${res.status} ${res.statusText}`);
+  }
+
+  return res.json()
+}
+
 export async function deleteUser(userId: string) {
   const res = await fetch(`/api/admin/users/${userId}`, {
     method: 'DELETE',
