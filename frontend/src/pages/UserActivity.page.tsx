@@ -50,7 +50,7 @@ export function UserActivityPage() {
                   <Text fw={500}>{expense.name}</Text>
                   <Text size="sm" c="dimmed">{expense.description}</Text>
                   <Text size="sm" c="dimmed">{expense.category}</Text>
-                  <Text size="sm" c="dimmed">{"$" + (expense.amount_cents / 100).toFixed(2)}</Text>
+                  <Text size="sm" c="dimmed">{"$" + (expense.amount).toFixed(2)}</Text>
                 </div>
                 <Text size="sm" c="dimmed" pr="md">{ new Intl.DateTimeFormat('en-AU').format(new Date(expense.created_at))}</Text>
               </Group>

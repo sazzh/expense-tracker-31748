@@ -44,7 +44,7 @@ export function TrendsPage() {
           <ExpenseBarChart byMonth={byMonth} />
           <Divider />
           <Text size="sm" ta="center" mt="xs">
-            Total across all months: ${(byMonth.reduce((sum, month) => sum + month.total, 0) / 100).toFixed(2)}
+            Total across all months: ${(byMonth.reduce((sum, month) => sum + Number(month.total), 0)).toFixed(2)}
           </Text>
         </Paper>
       </Group>

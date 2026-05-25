@@ -1,10 +1,11 @@
 import { DonutChart } from "@mantine/charts";
 import { CATEGORY_COLOURS, type Category } from "../types/Expense";
 import { Box, Divider, Group, Stack, Text } from "@mantine/core";
+import { formatMoney } from "../utils/numberFormat";
 
 export default function CategoryDonutChart({ byCategory }: { byCategory: { category: string, total: number }[] }) {
   const sortedCategories = [...byCategory].sort((a, b) => b.total - a.total)
-  const total = byCategory.reduce((sum, item) => sum + item.total, 0)
+  const total = byCategory.reduce((sum, item) => sum + Number(item.total), 0)
 
   return (
     <Stack align="center">
@@ -19,10 +20,10 @@ export default function CategoryDonutChart({ byCategory }: { byCategory: { categ
         paddingAngle={1}
         tooltipDataSource="segment"
         chartLabel="Category"
-        valueFormatter={(value) => `$${(value / 100).toFixed(2)}`}
+        valueFormatter={(value) => `$${formatMoney(value)}`}
         data={sortedCategories.map((item) => ({
           name: item.category.charAt(0).toUpperCase() + item.category.slice(1),
-          value: item.total,
+          value: Number(item.total),
           color: CATEGORY_COLOURS[item.category as Category],
         }))}
       />
@@ -36,7 +37,7 @@ export default function CategoryDonutChart({ byCategory }: { byCategory: { categ
               </Text>
             </Group>
             <Text size="sm" fw={500}>
-              ${(item.total / 100).toFixed(2)}
+              ${formatMoney(item.total)}
             </Text>
           </Group>
         ))}
@@ -46,7 +47,7 @@ export default function CategoryDonutChart({ byCategory }: { byCategory: { categ
             Total
           </Text>
           <Text size="sm">
-            ${(total / 100).toFixed(2)}
+            ${formatMoney(total)}
           </Text>
         </Group>
       </Stack>

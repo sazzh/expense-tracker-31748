@@ -15,7 +15,7 @@ export function ExpenseDetails({ expense }: { expense: Expense }) {
         />
         <NumberInput
           label="Amount ($)"
-          value={(expense.amount_cents / 100).toFixed(2)}
+          value={(expense.amount).toFixed(2)}
           withAsterisk
           prefix="$"
           thousandSeparator=","

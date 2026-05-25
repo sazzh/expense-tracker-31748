@@ -84,7 +84,7 @@ export default function ExpenseTable() {
               <Table.Td ta="center">{expense.id}</Table.Td>
               <Table.Td ta="center">{new Intl.DateTimeFormat('en-AU').format(new Date(expense.date))}</Table.Td>
               <Table.Td>{expense.name}</Table.Td>
-              <Table.Td>{"$" + (expense.amount_cents / 100).toFixed(2)}</Table.Td>
+              <Table.Td>{"$" + (expense.amount).toFixed(2)}</Table.Td>
               <Table.Td>
                 <Badge variant="light" radius="sm" color={CATEGORY_COLOURS[expense.category]}>
                   {expense.category.charAt(0).toUpperCase() + expense.category.slice(1)}

@@ -2,7 +2,7 @@ export type Expense = {
     id: string;
     date: string;
     name: string;
-    amount_cents: number; // cents for best math conversion
+    amount: number; // converted to from cents to dollars in backend 
     category: Category;
     description?: string | null;
     created_at: string;

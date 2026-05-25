@@ -1,5 +1,6 @@
 import { BarChart } from "@mantine/charts";
 import { Stack, Text } from "@mantine/core";
+import { formatMoney } from "../utils/numberFormat";
 
 export default function ExpenseBarChart({ byMonth }: { byMonth: { month: string, total: number }[] }) {
   return (
@@ -13,7 +14,7 @@ export default function ExpenseBarChart({ byMonth }: { byMonth: { month: string,
         w={400}
         data={byMonth}
         dataKey="month"
-        valueFormatter={(value) => `$${(value / 100).toFixed(2)}`}
+        valueFormatter={(value) => `$${formatMoney(value)}`}
         withBarValueLabel
         series={[
           { name: 'total', label: 'Total Expenses', color: 'primary' }, 

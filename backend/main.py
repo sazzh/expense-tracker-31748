@@ -7,10 +7,11 @@ from typing import Optional, cast
 from litestar import Litestar, Request, delete, get, post, put
 from litestar.plugins.sqlalchemy import SQLAlchemyPlugin, SQLAlchemyAsyncConfig, base, SQLAlchemyDTO, SQLAlchemyDTOConfig
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Date, Enum as SqlEnum, func, select, inspect
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Date, Enum as SqlEnum, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
-from collections.abc import AsyncGenerator, Sequence
+from sqlalchemy.ext.hybrid import hybrid_property
+from collections.abc import AsyncGenerator
 from litestar.exceptions import ClientException, HTTPException, NotFoundException
 from litestar.di import Provide
 import bcrypt
@@ -40,8 +41,16 @@ class Expense(base.BigIntBase):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.current_timestamp(), onupdate=func.current_timestamp())
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
+    @hybrid_property
+    def amount(self) -> float: # type: ignore[misc]
+        return self.amount_cents / 100
+    
+    @amount.setter
+    def amount(self, value: float) -> None:
+        self.amount_cents = round(value * 100)
+
 class ReadDTO(SQLAlchemyDTO[Expense]):
-    config = SQLAlchemyDTOConfig(include={"id", "date", "name", "amount_cents", "category", "description", "created_at", "updated_at", "user_id"})
+    config = SQLAlchemyDTOConfig(include={"id", "date", "name", "amount", "category", "description", "created_at", "updated_at", "user_id"})
 
 class WriteDTO(SQLAlchemyDTO[Expense]):
     config = SQLAlchemyDTOConfig(exclude={"id"})
@@ -240,7 +249,7 @@ async def get_all_user_expenses(user_id: int, transaction: AsyncSession) -> list
 # Trend Routes
 @get('/expenses/category')
 async def get_expenses_by_category(transaction: AsyncSession) -> list[dict[str, str | int]]:
-    query = select(Expense.category, func.sum(Expense.amount_cents).label("total")).group_by(Expense.category)
+    query = select(Expense.category, func.sum(Expense.amount).label("total")).group_by(Expense.category)
     result = await transaction.execute(query)
     data = [{"category": row.category, "total": row.total} for row in result.all()]
     return data
@@ -248,7 +257,7 @@ async def get_expenses_by_category(transaction: AsyncSession) -> list[dict[str, 
 @get('/expenses/month')
 async def get_expenses_by_month(transaction: AsyncSession) -> list[dict[str, str | int]]:
     query = select(func.strftime("%Y-%m", Expense.date).label("month"),
-                   func.sum(Expense.amount_cents).label("total")
+                   func.sum(Expense.amount).label("total")
                 ).group_by("month").order_by("month")
     result = await transaction.execute(query)
     data = [{"month": row.month, "total": row.total} for row in result.all()]

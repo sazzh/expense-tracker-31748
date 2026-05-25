@@ -15,7 +15,7 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
     mode: 'uncontrolled',
     initialValues: {
       name: expense?.name ?? '',
-      amount: expense ? (expense.amount_cents / 100) : '',
+      amount: expense ? (expense.amount) : '',
       date: expense?.date ?? new Date().toISOString().split('T')[0],
       category: expense?.category ?? '',
       description: expense?.description ?? '',
