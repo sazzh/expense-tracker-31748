@@ -2,7 +2,6 @@ import { createBrowserRouter, Navigate, Outlet, RouterProvider } from "react-rou
 import { HomePage } from "./pages/Home.page";
 import AppShellLayout from "./components/AppLayout";
 import { AddExpensePage } from "./pages/AddExpense.page";
-import { EditExpensePage } from "./pages/EditExpense.page";
 import { TrendsPage } from "./pages/Trends.page";
 import { LoginPage } from "./pages/Login.page";
 import { RegisterPage } from "./pages/Register.page";
@@ -77,10 +76,6 @@ const router = createBrowserRouter([
           {
             path: '/expense',
             element: <AddExpensePage />
-          },
-          {
-            path: '/expense/:expenseId',
-            element: <EditExpensePage />
           },
           {
             path: '/trends',
