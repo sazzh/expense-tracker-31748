@@ -39,7 +39,7 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
       const vals = form.getValues();
       const body = {
         name: vals.name.trim(),
-        amount_cents: Math.round(Number(vals.amount) * 100), // convert dollars to cents
+        amount: Number(vals.amount),
         date: vals.date,
         category: vals.category as Category,
         description: vals.description.trim() || undefined,

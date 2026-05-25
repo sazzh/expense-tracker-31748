@@ -13,7 +13,7 @@ export type Expense = {
 export type CreateExpense = {
     date: string;
     name: string;
-    amount_cents: number; // cents for best math conversion
+    amount: number;
     category: Category;
     description?: string | null;
 }
