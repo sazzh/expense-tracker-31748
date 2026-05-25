@@ -8,10 +8,10 @@ import { useNavigate } from "react-router";
 
 type ExpenseFormProps = {
   expense?: Expense;
+  onSuccess?: () => void;
 }
 
-export default function ExpenseForm({ expense }: ExpenseFormProps) {
-  const navigate = useNavigate();
+export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -46,7 +46,7 @@ export default function ExpenseForm({ expense }: ExpenseFormProps) {
       await createExpense(body);
     }
 
-    navigate('/');
+    onSuccess?.();
   };
 
   return (

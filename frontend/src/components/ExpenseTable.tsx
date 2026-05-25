@@ -2,9 +2,9 @@ import { ActionIcon, Badge, Box, LoadingOverlay, Paper, Table, Text } from "@man
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { CATEGORY_COLOURS, type Category, type Expense } from "../types/Expense";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { deleteExpense, getExpenses } from "../api/Expenses";
 import ExpenseFilters from "./ExpenseFilters";
+import ExpenseModal from "./ExpenseModal";
 
 export default function ExpenseTable() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -12,6 +12,8 @@ export default function ExpenseTable() {
   const [error, setError] = useState<Error | null>(null);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<Category[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [initialMode, setInitialMode] = useState<"view" | "edit">("view");
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -28,6 +30,9 @@ export default function ExpenseTable() {
 
     fetchExpenses();
   }, []);
+
+  const openView = (id: string) => { setSelectedId(id); setInitialMode("view"); };
+  const openEdit = (id: string) => { setSelectedId(id); setInitialMode("edit"); };
 
   const filtered = expenses.filter((expense) => {
     const matchesSearch = expense.name.toLowerCase().includes(search.toLowerCase());
@@ -74,7 +79,8 @@ export default function ExpenseTable() {
             </Table.Tr>
           ) : (
           filtered.map((expense) =>
-            <Table.Tr key={expense.id}>
+            // each row (expense) is clickable to view it in modal
+            <Table.Tr key={expense.id} onClick={() => openView(expense.id)} style={{ cursor: "pointer" }}>
               <Table.Td ta="center">{expense.id}</Table.Td>
               <Table.Td ta="center">{new Intl.DateTimeFormat('en-AU').format(new Date(expense.date))}</Table.Td>
               <Table.Td>{expense.name}</Table.Td>
@@ -88,7 +94,8 @@ export default function ExpenseTable() {
               <Table.Td>
                   <ActionIcon.Group>
                     <ActionIcon variant="subtle" aria-label="Edit Expense"
-                      component={Link} to={`/expense/${expense.id}`}>
+                      // as row is clickable for view, stop propagation allows icon to be edit instead of view
+                      onClick={(e) => { e.stopPropagation(); openEdit(expense.id) }}>
                       <IconEdit stroke={1.25} color="black" />
                     </ActionIcon>
                     <ActionIcon variant="subtle" aria-label="Delete Expense"
@@ -102,6 +109,10 @@ export default function ExpenseTable() {
         }
         </Table.Tbody>
       </Table>
+      <ExpenseModal expenseId={selectedId ?? ""}
+        opened={!!selectedId}
+        onClose={() => setSelectedId(null)}
+        initialMode={initialMode} />
     </Paper>
     </Box>
   );
