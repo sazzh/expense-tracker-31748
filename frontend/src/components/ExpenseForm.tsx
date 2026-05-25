@@ -66,6 +66,7 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
         prefix="$"
         thousandSeparator=","
         allowNegative={false}
+        max={1000000}
         decimalScale={2}
         fixedDecimalScale
         stepHoldDelay={500}
