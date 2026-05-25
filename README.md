@@ -44,8 +44,10 @@ npm run dev
 
 ## Feature List
 <!-- feature list - bullet point list such as 'Responsive mobile design', 'Dynamic filtering', 'Dark mode toggle' -->
+- User roles and authentication (admin and normal user)
+- Admin dashboard for user management
 - Responsive layout
-- Search and multi-select filtering
+- Live search and category filtering
 - Form validation
 - Dynamic data visualisation with charts
 - API integration
@@ -63,8 +65,10 @@ expense-tracker-31748/
 |   ├── src/
 |   |   ├── api/                # frontend fetch functions for backend endpoints
 |   |   ├── components/         # reusable UI components
+|   |   ├── hooks/              # reusable react hook functions
 |   |   ├── pages/              # route-level components
 |   |   ├── types/              # TypeScript types
+|   |   ├── utils/              # utility functions for reusability
 |   |   ├── App.tsx             # root component
 |   |   ├── main.tsx            # entry point, mounts app to DOM
 |   |   ├── Router.tsx          # React Router route definitions
@@ -81,6 +85,9 @@ expense-tracker-31748/
 ├── package.json                # root scripts (concurrently)
 └── README.md                   
 ```
+
+## Workload
+This assignment was completed individually so all work and files are mine.
 
 ## Challenges Overcome
 <!-- summary of challenges overcome - 4/5 sentences okay -->
