@@ -4,6 +4,7 @@ import { getUser, getUserExpenses } from "../api/Users";
 import { useEffect, useState } from "react";
 import type { User } from "../types/User";
 import type { Expense } from "../types/Expense";
+import BackButton from "../components/BackButton";
 
 export function UserPage() {
   const navigate = useNavigate();
@@ -14,8 +15,8 @@ export function UserPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const user: User = await getUser(id);
-        const expenses: Expense[] = await getUserExpenses(id);
+        const user: User = await getUser(id!);
+        const expenses: Expense[] = await getUserExpenses(id!);
         setUser(user);
         setExpenses(expenses);
       } catch (err) {
@@ -35,11 +36,12 @@ export function UserPage() {
     );
   }
 
-  const totalSpent = expenses.reduce((sum, e) => sum + e.amount_cents, 0);
+  const totalSpent = expenses.reduce((sum, e) => sum + e.amount, 0);
 
   return (
     <>
       <Box mx="auto" w="100%" maw="1050" p="sm">
+        <BackButton />
         <h1 className="title">Manage {user.username}</h1>
         <Paper shadow="sm" radius="md" pl="md" withBorder>
           <h3 style={{ marginBottom: '0.5rem' }}>User Details</h3>
@@ -48,17 +50,17 @@ export function UserPage() {
           <Text c="dimmed" size="sm" ml="md">Role: {user.role}.</Text>
           <h3 style={{ marginBottom: '0.5rem' }}>Expense Summary</h3>
           <Text c="dimmed" size="sm" ml="md">Total expenses: {expenses.length}.</Text>
-          <Text c="dimmed" size="sm" ml="md" mb="lg">Total spent: ${(totalSpent / 100).toFixed(2)}.</Text>
+          <Text c="dimmed" size="sm" ml="md" mb="lg">Total spent: ${(totalSpent).toFixed(2)}.</Text>
 
         </Paper>
         <Group mt="lg">
-          <Button variant="light" onClick={() => navigate(`/admin/users/${user.id}/expenses`)}>
+          <Button variant="light" color="gray" onClick={() => navigate(`/admin/users/${user.id}/expenses`)}>
             View Activity
           </Button>
           <Button variant="light">
             Edit Details
           </Button>
-          <Button variant="outline" color="red">
+          <Button variant="light" color="red">
             Delete User
           </Button>
         </Group>

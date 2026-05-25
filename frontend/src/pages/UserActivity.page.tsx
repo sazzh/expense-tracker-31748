@@ -4,6 +4,7 @@ import { getUser, getUserExpenses } from "../api/Users";
 import { useEffect, useState } from "react";
 import type { User } from "../types/User";
 import type { Expense } from "../types/Expense";
+import BackButton from "../components/BackButton";
 
 export function UserActivityPage() {
   const { id } = useParams();
@@ -39,6 +40,7 @@ export function UserActivityPage() {
   return (
     <>
       <Box mx="auto" w="100%" maw="1050" p="sm">
+        <BackButton />
         <h1 className="title">{user.username}'s Activity</h1>
         <Text c="dimmed" size="sm" ml="lg">Viewing expense history of {user.role} {user.username}.</Text>
 

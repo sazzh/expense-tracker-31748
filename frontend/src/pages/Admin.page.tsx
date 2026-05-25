@@ -4,6 +4,7 @@ import { getUsers } from "../api/Users";
 import { useEffect, useState } from "react";
 import type { User } from "../types/User";
 import { IconTrash } from "@tabler/icons-react";
+import BackButton from "../components/BackButton";
 
 export function AdminPage() {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ export function AdminPage() {
   return (
     <>
       <Box mx="auto" w="100%" maw="1050" p="sm">
+        <BackButton />
         <h1 className="title">Expense Tracker Activity</h1>
         <Text c="dimmed" size="sm" ml="lg">View all users accounts and their activity.</Text>
 
@@ -44,11 +46,11 @@ export function AdminPage() {
                   <Text size="sm" c="dimmed">User's role: {user.role}</Text>
                 </div>
                 <Group gap="sm">
+                  <Button variant="light" color="gray" onClick={() => navigate(`/admin/users/${user.id}/expenses`)}>
+                    View Activity
+                  </Button>
                   <Button variant="light" onClick={() => navigate(`/admin/users/${user.id}`)}>
                     Manage Account
-                  </Button>
-                  <Button variant="light" onClick={() => navigate(`/admin/users/${user.id}/expenses`)}>
-                    View Activity
                   </Button>
                   <ActionIcon variant="subtle" aria-label="Delete Expense"
                     onClick={() => handleDelete(user.id)}>
