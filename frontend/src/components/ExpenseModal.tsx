@@ -12,9 +12,10 @@ interface ExpenseModalProps {
   opened: boolean;
   onClose: () => void;
   initialMode?: "view" | "edit";
+  onSuccess?: (updated?: Expense) => void;
 }
 
-export default function ExpenseModal({ expenseId, opened, onClose, initialMode = "view" }: ExpenseModalProps) {
+export default function ExpenseModal({ expenseId, opened, onClose, initialMode = "view", onSuccess }: ExpenseModalProps) {
   const [expense, setExpense] = useState<Expense | null>(null);
   const [mode, setMode] = useState<"view" | "edit">(initialMode);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +52,7 @@ export default function ExpenseModal({ expenseId, opened, onClose, initialMode =
           {mode === "view" && (
             <Stack>
               <ExpenseDetails expense={expense} />
-              <Button leftSection={<IconEdit />} c="black" w="fit-content" mx="auto" mt="md"
+              <Button leftSection={<IconEdit />} variant="light" w="fit-content" mx="auto" mt="md"
                 onClick={() => setMode("edit")}>
                   Edit
               </Button>
@@ -59,7 +60,7 @@ export default function ExpenseModal({ expenseId, opened, onClose, initialMode =
           )}
 
           {mode === "edit" && (
-            <ExpenseForm expense={expense} onSuccess={onClose} />
+            <ExpenseForm expense={expense} onSuccess={(updated) => { onClose(); onSuccess?.(updated); }} />
           )}
         </>
       )}

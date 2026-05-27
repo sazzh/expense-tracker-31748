@@ -118,10 +118,17 @@ export default function ExpenseTable() {
         }
         </Table.Tbody>
       </Table>
-      <ExpenseModal expenseId={selectedId ?? ""}
+      <ExpenseModal 
+        expenseId={selectedId ?? ""}
         opened={!!selectedId}
         onClose={() => setSelectedId(null)}
-        initialMode={initialMode} />
+        initialMode={initialMode}
+        onSuccess={(updated) => {
+          setSelectedId(null);
+          if (updated) {
+            setExpenses(prev => prev.map(e => e.id === updated.id ? updated : e));
+          }
+        }} />
     </Paper>
     {filtered.length > PAGE_SIZE && (
         <Group justify="center" pt="md">

@@ -9,7 +9,7 @@ import { capitalise } from "../utils/capitaliseFormat";
 
 type ExpenseFormProps = {
   expense?: Expense;
-  onSuccess?: () => void;
+  onSuccess?: (updated?: Expense) => void;
 }
 
 export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
@@ -47,16 +47,14 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
       }
 
       if (expense) {
-        await updateExpense(expense.id, body);
+        const res = await updateExpense(expense.id, body);
+        onSuccess?.(res);
         alert('Expense updated successfully');
       } else {
         await createExpense(body);
         form.reset();
         setStatus({ type: 'success', message: 'Expense created successfully.' });
-      }
-
-      if (onSuccess) {
-        onSuccess();
+        onSuccess?.();
       }
     } catch (err) {
       setStatus({ type: 'error', message: expense ? 'Failed to update expense' : 'Failed to create new expense' });
