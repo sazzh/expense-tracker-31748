@@ -51,6 +51,7 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
         setStatus({ type: 'success', message: 'Expense updated successfully.' });
       } else {
         await createExpense(body);
+        form.reset();
         setStatus({ type: 'success', message: 'Expense created successfully.' });
       }
 
