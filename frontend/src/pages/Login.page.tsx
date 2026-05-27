@@ -72,7 +72,7 @@ export function LoginPage() {
               {...form.getInputProps('password')}
             />
             <Group className="btn">
-              <Button c="black" type="submit">Login</Button>
+              <Button variant="light" type="submit">Login</Button>
             </Group>
           </form>
         </Paper>

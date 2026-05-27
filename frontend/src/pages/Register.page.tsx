@@ -85,7 +85,7 @@ export function RegisterPage() {
               {...form.getInputProps('confirmPassword')}
             />
             <Group className="btn">
-              <Button c="black" type="submit">Register</Button>
+              <Button variant="light" type="submit">Register</Button>
             </Group>
           </form>
         </Paper>

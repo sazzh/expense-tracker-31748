@@ -1,6 +1,7 @@
 import { Box, Button, Text } from "@mantine/core";
 import ExpenseTable from "../components/ExpenseTable";
 import { useNavigate } from "react-router";
+import { IconPlus } from "@tabler/icons-react";
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -14,8 +15,12 @@ export function HomePage() {
         <Text c="dimmed" size="sm" ml="lg" mb="lg">Click on view trends to see your detailed spending patterns.</Text>
         <ExpenseTable />
         <div className="btn">
-          <Button c="black"  onClick={() => navigate('/expense')}>Add new expense</Button>
-          <Button c="black"  onClick={() => navigate('/trends')}>View Trends</Button>
+          <Button leftSection={<IconPlus />} variant="light" onClick={() => navigate('/expense')}>
+            Add Expense
+          </Button>
+          <Button variant="light" color="gray" onClick={() => navigate('/trends')}>
+            View Trends
+          </Button>
         </div>
       </Box>
     </>

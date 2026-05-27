@@ -53,16 +53,16 @@ export default function ExpenseTable() {
     <Box>
     <ExpenseFilters search={search} onSearchChange={setSearch} category={category} onCategoryChange={setCategory} />
     <Paper shadow="sm" radius="md" withBorder style={{overflow: "hidden"}}>
-      <Table verticalSpacing="xs" highlightOnHover striped stripedColor="primary.0">
-        <Table.Thead bg="primary.3">
+      <Table verticalSpacing="xs" highlightOnHover>
+        <Table.Thead bg="gray.1">
           <Table.Tr>
-            <Table.Th w={60} ta="center">ID</Table.Th>
-            <Table.Th w={130} ta="center">Date</Table.Th>
-            <Table.Th w={220}>Expense</Table.Th>
-            <Table.Th w={150}>Amount ($)</Table.Th>
-            <Table.Th w={180}>Category</Table.Th>
-            <Table.Th w={220}>Description</Table.Th>
-            <Table.Th w={90}>Actions</Table.Th>
+            <Table.Th w={60} ta="center" fw={600}>ID</Table.Th>
+            <Table.Th w={130} ta="center" fw={600}>Date</Table.Th>
+            <Table.Th w={220} fw={600}>Expense</Table.Th>
+            <Table.Th w={150} fw={600}>Amount ($)</Table.Th>
+            <Table.Th w={180} fw={600}>Category</Table.Th>
+            <Table.Th w={220} fw={600}>Description</Table.Th>
+            <Table.Th w={90} fw={600}>Actions</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -85,22 +85,22 @@ export default function ExpenseTable() {
               <Table.Td ta="center">{expense.id}</Table.Td>
               <Table.Td ta="center">{new Intl.DateTimeFormat('en-AU').format(new Date(expense.date))}</Table.Td>
               <Table.Td>{expense.name}</Table.Td>
-              <Table.Td>{"$" + (expense.amount).toFixed(2)}</Table.Td>
+              <Table.Td>${expense.amount.toFixed(2)}</Table.Td>
               <Table.Td>
-                <Badge variant="light" radius="sm" color={CATEGORY_COLOURS[expense.category]}>
+                <Badge variant="dot" radius="lg" color={CATEGORY_COLOURS[expense.category]}>
                   {capitalise(expense.category)}
                 </Badge>
               </Table.Td>
-              <Table.Td style={{ color: '#868e96'}}>{expense.description ?? ""}</Table.Td>
+              <Table.Td c="dimmed">{expense.description ?? ""}</Table.Td>
               <Table.Td>
                   <ActionIcon.Group>
                     <ActionIcon variant="subtle" aria-label="Edit Expense"
                       // as row is clickable for view, stop propagation allows icon to be edit instead of view
                       onClick={(e) => { e.stopPropagation(); openEdit(expense.id) }}>
-                      <IconEdit stroke={1.25} color="black" />
+                      <IconEdit stroke={1.25} color="var(--mantine-color-text)" />
                     </ActionIcon>
                     <ActionIcon variant="subtle" aria-label="Delete Expense"
-                      onClick={() => handleDelete(expense.id)}>
+                      onClick={(e) => { e.stopPropagation(); handleDelete(expense.id) }}>
                       <IconTrash stroke={1.25} color="var(--danger)" />
                     </ActionIcon>
                   </ActionIcon.Group>

@@ -136,7 +136,7 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
         {...form.getInputProps('description')}
       />
       <Group className="btn">
-        <Button c="black" type="submit" loading={loading}>Submit</Button>
+        <Button variant="light" type="submit" loading={loading}>Submit</Button>
       </Group>
     </form>
     </Box>

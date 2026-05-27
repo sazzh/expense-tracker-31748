@@ -84,7 +84,7 @@ export default function EditUserForm({ user, onSuccess }: EditUserFormProps) {
         />
 
         <Group mt="lg">
-          <Button type="submit" loading={loading} c="black">
+          <Button type="submit" loading={loading} variant="light">
             Save Changes
           </Button>
         </Group>
