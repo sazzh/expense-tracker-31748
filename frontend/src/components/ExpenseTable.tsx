@@ -1,4 +1,4 @@
-import { ActionIcon, Badge, Box, LoadingOverlay, Paper, Table, Text } from "@mantine/core";
+import { ActionIcon, Badge, Box, LoadingOverlay, Paper, Table, Text, Pagination, Group } from "@mantine/core";
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { CATEGORY_COLOURS, type Category, type Expense } from "../types/Expense";
 import { useEffect, useState } from "react";
@@ -15,6 +15,8 @@ export default function ExpenseTable() {
   const [category, setCategory] = useState<Category[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [initialMode, setInitialMode] = useState<"view" | "edit">("view");
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 6;
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -32,6 +34,10 @@ export default function ExpenseTable() {
     fetchExpenses();
   }, []);
 
+  useEffect(() => {
+    setPage(1);
+  }, [search, category]);
+
   const openView = (id: string) => { setSelectedId(id); setInitialMode("view"); };
   const openEdit = (id: string) => { setSelectedId(id); setInitialMode("edit"); };
 
@@ -40,6 +46,8 @@ export default function ExpenseTable() {
     const matchesCategory = category.length > 0 ? category.includes(expense.category) : true;
     return matchesSearch && matchesCategory;
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this expense?")) { return }
@@ -79,7 +87,7 @@ export default function ExpenseTable() {
               </Table.Td>
             </Table.Tr>
           ) : (
-          filtered.map((expense) =>
+          paginated.map((expense) =>
             // each row (expense) is clickable to view it in modal
             <Table.Tr key={expense.id} onClick={() => openView(expense.id)} style={{ cursor: "pointer" }}>
               <Table.Td ta="center">{expense.id}</Table.Td>
@@ -115,6 +123,18 @@ export default function ExpenseTable() {
         onClose={() => setSelectedId(null)}
         initialMode={initialMode} />
     </Paper>
+    {filtered.length > PAGE_SIZE && (
+        <Group justify="center" pt="md">
+          <Pagination
+            value={page}
+            onChange={setPage}
+            total={Math.ceil(filtered.length / PAGE_SIZE)}
+            size="sm"
+            variant="light"
+            color="violet.1"
+          />
+        </Group>
+      )}
     </Box>
   );
 }
