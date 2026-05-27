@@ -81,6 +81,7 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
     <form onSubmit={form.onSubmit(() => handleSubmit())}>
       <Group align="baseline" grow>
       <TextInput
+        autoFocus
         withAsterisk
         label="Expense Name"
         placeholder="Groceries, Rent, etc."
