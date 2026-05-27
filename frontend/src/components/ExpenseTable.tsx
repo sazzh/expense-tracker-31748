@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { deleteExpense, getExpenses } from "../api/Expenses";
 import ExpenseFilters from "./ExpenseFilters";
 import ExpenseModal from "./ExpenseModal";
+import { capitalise } from "../utils/capitaliseFormat";
 
 export default function ExpenseTable() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -87,7 +88,7 @@ export default function ExpenseTable() {
               <Table.Td>{"$" + (expense.amount).toFixed(2)}</Table.Td>
               <Table.Td>
                 <Badge variant="light" radius="sm" color={CATEGORY_COLOURS[expense.category]}>
-                  {expense.category.charAt(0).toUpperCase() + expense.category.slice(1)}
+                  {capitalise(expense.category)}
                 </Badge>
               </Table.Td>
               <Table.Td style={{ color: '#868e96'}}>{expense.description ?? ""}</Table.Td>

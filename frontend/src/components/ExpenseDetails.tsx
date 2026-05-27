@@ -2,6 +2,7 @@ import { Group, NumberInput, Select, TextInput, Textarea } from "@mantine/core";
 import { CATEGORIES, type Expense } from "../types/Expense";
 import { DatePickerInput } from "@mantine/dates";
 import { IconCalendarWeek, IconCategory2 } from "@tabler/icons-react";
+import { capitalise } from "../utils/capitaliseFormat";
 
 export function ExpenseDetails({ expense }: { expense: Expense }) {
   return (
@@ -35,7 +36,7 @@ export function ExpenseDetails({ expense }: { expense: Expense }) {
         <Select
           label="Category"
           value={expense.category.toLowerCase()}
-          data={CATEGORIES.map((c) => ({ label: c.charAt(0).toUpperCase() + c.slice(1), value: c }))}
+          data={CATEGORIES.map((category) => ({ label: capitalise(category), value: category }))}
           withAsterisk
           leftSection={<IconCategory2 stroke={1.25} />}
           readOnly

@@ -1,6 +1,7 @@
 import { Button, Flex, MultiSelect, TextInput } from "@mantine/core";
 import { IconCaretDown, IconCategory2, IconSearch } from "@tabler/icons-react";
 import { CATEGORIES, type Category } from "../types/Expense";
+import { capitalise } from "../utils/capitaliseFormat";
 
 type filterProps = {
   search: string;
@@ -27,7 +28,7 @@ export default function ExpenseFilters({ search, category, onSearchChange, onCat
         hidePickedOptions
         
         data={CATEGORIES.map((category) => ({ 
-          label: category.charAt(0).toUpperCase() + category.slice(1), 
+          label: capitalise(category), 
           value: category
         }))}
         value={category}

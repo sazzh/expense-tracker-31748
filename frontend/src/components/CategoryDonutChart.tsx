@@ -2,6 +2,7 @@ import { DonutChart } from "@mantine/charts";
 import { CATEGORY_COLOURS, type Category } from "../types/Expense";
 import { Box, Divider, Group, Stack, Text } from "@mantine/core";
 import { formatMoney } from "../utils/numberFormat";
+import { capitalise } from "../utils/capitaliseFormat";
 
 export default function CategoryDonutChart({ byCategory }: { byCategory: { category: string, total: number }[] }) {
   const sortedCategories = [...byCategory].sort((a, b) => b.total - a.total)
@@ -22,7 +23,7 @@ export default function CategoryDonutChart({ byCategory }: { byCategory: { categ
         chartLabel="Category"
         valueFormatter={(value) => `$${formatMoney(value)}`}
         data={sortedCategories.map((item) => ({
-          name: item.category.charAt(0).toUpperCase() + item.category.slice(1),
+          name: capitalise(item.category),
           value: Number(item.total),
           color: CATEGORY_COLOURS[item.category as Category],
         }))}
@@ -33,7 +34,7 @@ export default function CategoryDonutChart({ byCategory }: { byCategory: { categ
             <Group gap="xs">
               <Box w={10} h={10} bg={CATEGORY_COLOURS[item.category as Category]} style={{ borderRadius: "50%" }} />
               <Text size="sm" c="dimmed">
-                {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
+                {capitalise(item.category)}
               </Text>
             </Group>
             <Text size="sm" fw={500}>

@@ -5,6 +5,7 @@ import { CATEGORIES, type Category, type Expense } from "../types/Expense";
 import { IconAlertCircle, IconCalendarWeek, IconCaretDown, IconCategory2, IconCheck } from '@tabler/icons-react';
 import { createExpense, updateExpense } from "../api/Expenses";
 import { useState } from "react";
+import { capitalise } from "../utils/capitaliseFormat";
 
 type ExpenseFormProps = {
   expense?: Expense;
@@ -117,7 +118,7 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
         label="Category"
         placeholder="Select category of your expense"
         data={CATEGORIES.map((categories) => ({ 
-          label: categories.charAt(0).toUpperCase() + categories.slice(1), 
+          label: capitalise(categories), 
           value: categories
         }))}
         leftSection={<IconCategory2 stroke={1.25} />}
