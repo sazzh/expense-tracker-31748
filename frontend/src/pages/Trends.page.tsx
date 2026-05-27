@@ -1,12 +1,13 @@
-import { Alert, Box, Center, Divider, Group, Loader, Paper, Text } from "@mantine/core";
+import { Box, Center, Divider, Group, Loader, Paper, Text } from "@mantine/core";
 import BackButton from "../components/BackButton";
 import { useCallback, useEffect, useState } from "react";
 import { type MonthlyExpenses, type CategoryTotal } from "../types/Trends";
 import CategoryDonutChart from "../components/CategoryDonutChart";
 import ExpenseBarChart from "../components/ExpensesBarChart";
-import { IconAlertCircle, IconCalendar } from "@tabler/icons-react";
+import { IconCalendar } from "@tabler/icons-react";
 import { getExpensesByCategory, getExpensesByMonth } from "../api/Expenses";
 import { MonthPickerInput } from "@mantine/dates";
+import ErrorAlert from "../components/ErrorAlert";
 
 export function TrendsPage() {
   const [byCategory, setByCategory] = useState<CategoryTotal[]>([]);
@@ -27,7 +28,7 @@ export function TrendsPage() {
       setByCategory(categoryTrend);
       setByMonth(monthlyTrend);
     } catch (error) {
-      setError("Failed to load trends. Please try again later.");
+      setError("Failed to load trend data. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -85,13 +86,7 @@ export function TrendsPage() {
         </Center>
       )}
 
-      {error && (
-        <Center>
-          <Alert icon={<IconAlertCircle size={16} />} color="red" maw={500}>
-            {error}
-          </Alert>
-        </Center>
-      )}
+      <ErrorAlert error={error} centered />
 
       {!loading && !error && (
         <Group justify="center" gap={50}>

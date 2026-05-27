@@ -1,10 +1,11 @@
-import { ActionIcon, Alert, Box, Button, Center, Group, Loader, Text } from "@mantine/core";
+import { ActionIcon, Box, Button, Center, Group, Loader, Text } from "@mantine/core";
 import { useNavigate } from "react-router";
 import { getUsers } from "../api/Users";
 import { useEffect, useState } from "react";
 import type { User } from "../types/User";
-import { IconAlertCircle, IconTrash } from "@tabler/icons-react"; 
+import { IconTrash } from "@tabler/icons-react"; 
 import { useDeleteUser } from "../hooks/useDeleteUser";
+import ErrorAlert from "../components/ErrorAlert";
 
 export function AdminPage() {
   const navigate = useNavigate();
@@ -41,12 +42,7 @@ export function AdminPage() {
         <Text c="dimmed" size="sm" ml="lg">View all users accounts and their activity.</Text>
 
         {loading && <Center mt="xl"><Loader /></Center>}
-
-        {error && (
-          <Alert icon={<IconAlertCircle size={16} />} color="red">
-            {error}
-          </Alert>
-        )}
+        <ErrorAlert error={error} />
 
         {!loading && !error && (
         <Box mt="lg">

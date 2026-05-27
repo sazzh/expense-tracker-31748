@@ -1,10 +1,10 @@
-import { Alert, Box, Center, Loader } from "@mantine/core";
+import { Box, Center, Loader } from "@mantine/core";
 import { useNavigate, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { getUser } from "../api/Users";
 import type { User } from "../types/User";
 import EditUserForm from "../components/UserForm";
-import { IconAlertCircle } from "@tabler/icons-react";
+import ErrorAlert from "../components/ErrorAlert";
 
 export function EditUserPage() {
   const { id } = useParams();
@@ -35,25 +35,8 @@ export function EditUserPage() {
 		)
 	}
 
-	if (error) {
-		return (
-			<Center>
-				<Alert icon={<IconAlertCircle size={16} />} color="red" maw={500}>
-					{error}
-				</Alert>
-		</Center>
-		)
-	}
-
-	if (!user) {
-    return (
-      <>
-      <Alert icon={<IconAlertCircle size={16} />} color="red">
-        User not found
-      </Alert>
-      </>
-    );
-  }
+	if (error) <ErrorAlert error={error} centered />  
+	if (!user) return <ErrorAlert error="User not found" />
 
   return (
     <Box mx="auto" maw={800} p="sm">

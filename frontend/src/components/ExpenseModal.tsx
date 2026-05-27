@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Modal, LoadingOverlay, Button, Stack, Center, Alert } from "@mantine/core";
-import { IconAlertCircle, IconEdit } from "@tabler/icons-react";
+import { Modal, LoadingOverlay, Button, Stack } from "@mantine/core";
+import { IconEdit } from "@tabler/icons-react";
 import ExpenseForm from "./ExpenseForm";
 import type { Expense } from "../types/Expense";
 import { getExpense } from "../api/Expenses";
 import { ExpenseDetails } from "./ExpenseDetails";
+import ErrorAlert from "./ErrorAlert";
 
 interface ExpenseModalProps {
   expenseId: string;
@@ -43,13 +44,7 @@ export default function ExpenseModal({ expenseId, opened, onClose, initialMode =
       size="md"
     >
       <LoadingOverlay visible={!expense && !error} />
-      {error && (
-        <Center>
-          <Alert icon={<IconAlertCircle size={16} />} color="red" maw={500}>
-            {error}
-          </Alert>
-        </Center>
-      )}
+      <ErrorAlert error={error} centered />
 
       {expense && (
         <>

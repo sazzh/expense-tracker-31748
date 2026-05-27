@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Group, Paper, Text } from "@mantine/core";
+import { Box, Button, Group, Paper, Text } from "@mantine/core";
 import { useNavigate, useParams } from "react-router";
 import { getUser, getUserExpenses } from "../api/Users";
 import { useEffect, useState } from "react";
@@ -6,7 +6,7 @@ import type { User } from "../types/User";
 import type { Expense } from "../types/Expense";
 import BackButton from "../components/BackButton";
 import { useDeleteUser } from "../hooks/useDeleteUser";
-import { IconAlertCircle } from "@tabler/icons-react";
+import ErrorAlert from "../components/ErrorAlert";
 
 export function UserPage() {
   const navigate = useNavigate();
@@ -53,9 +53,7 @@ export function UserPage() {
   if (error) {
     return (
       <>
-      <Alert icon={<IconAlertCircle size={16} />} color="red">
-        {error}
-      </Alert>
+      <ErrorAlert error={error} />
       <Button c="black" mt="md" onClick={() => navigate('/admin-dashboard')}>
         Return
       </Button>
@@ -63,15 +61,7 @@ export function UserPage() {
     );
   }
 
-  if (!user) {
-    return (
-      <>
-      <Alert icon={<IconAlertCircle size={16} />} color="red">
-        User not found
-      </Alert>
-      </>
-    );
-  }
+  if (!user) return <ErrorAlert error="User not found" />
 
   return (
     <>

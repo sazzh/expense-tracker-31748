@@ -1,11 +1,12 @@
-import { Alert, Box, Center, Group, Loader, Paper, Text } from "@mantine/core";
+import { Box, Center, Group, Loader, Paper, Text } from "@mantine/core";
 import { useParams } from "react-router";
 import { getUser, getUserExpenses } from "../api/Users";
 import { useEffect, useState } from "react";
 import type { User } from "../types/User";
 import type { Expense } from "../types/Expense";
 import BackButton from "../components/BackButton";
-import { IconAlertCircle, IconCoin } from "@tabler/icons-react";
+import { IconCoin } from "@tabler/icons-react";
+import ErrorAlert from "../components/ErrorAlert";
 
 export function UserActivityPage() {
   const { id } = useParams();
@@ -39,25 +40,8 @@ export function UserActivityPage() {
 		)
 	}
 
-	if (error) {
-		return (
-			<Center>
-				<Alert icon={<IconAlertCircle size={16} />} color="red" maw={500}>
-					{error}
-				</Alert>
-		</Center>
-		)
-	}
-
-	if (!user) {
-    return (
-      <>
-      <Alert icon={<IconAlertCircle size={16} />} color="red">
-        User not found
-      </Alert>
-      </>
-    );
-  }
+	if (error) return <ErrorAlert error={error} centered />
+	if (!user) return <ErrorAlert error="User not found" />
 
   return (
     <>
