@@ -48,7 +48,7 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
 
       if (expense) {
         await updateExpense(expense.id, body);
-        setStatus({ type: 'success', message: 'Expense updated successfully.' });
+        alert('Expense updated successfully');
       } else {
         await createExpense(body);
         form.reset();
