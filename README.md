@@ -32,6 +32,21 @@ npm run dev
 ```
 4. Navigate to `http://localhost:5173` and have fun!
 
+## .env
+.env file required for user registration and login as it stores secret key to sign JWT tokens
+1. Create an env file in the backend directory
+```
+/backend/.env
+```
+2. Run this command in PowerShell to generate your secret key
+```
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+3. Add your key into your `.env` file
+```
+SECRET_KEY=key-you-just-generated
+```
+
 ## Pre-Configured Users
 Users can sign up through the webpage.  
 Admins can only be added through the database.  
