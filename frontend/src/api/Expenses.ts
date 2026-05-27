@@ -1,5 +1,7 @@
 import { type CreateExpense, type Expense } from "../types/Expense";
 
+type DateRange = { startDate?: string; endDate?: string };
+
 export async function getExpenses(): Promise<Expense[]> {
     const res = await fetch('/api/expenses', {
         method: 'GET',
@@ -79,8 +81,22 @@ export async function deleteExpense(id: string): Promise<void> {
     // doesn't return anything
 }
 
-export async function getExpensesByCategory(): Promise<{ category: string, total: number }[]> {
-    const res = await fetch('/api/expenses/category', {
+// converts date range into url query for trend endpoints
+function buildQuery({ startDate, endDate }: DateRange): string {
+    const params = new URLSearchParams();
+    if (startDate) params.set("start_date", startDate);
+    if (endDate) params.set("end_date", endDate);
+    const querys = params.toString();
+    return querys ? `?${querys}` : "";
+}
+
+export async function getExpensesByCategory(startDate?: string | null, endDate?: string | null): Promise<{ category: string, total: number }[]> {
+    const range = {
+        startDate: startDate ?? undefined,
+        endDate: endDate ?? undefined,
+    }
+    
+    const res = await fetch(`/api/expenses/category${buildQuery(range)}`, {
         method: 'GET',
         headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -94,8 +110,13 @@ export async function getExpensesByCategory(): Promise<{ category: string, total
     return res.json();
 }
 
-export async function getExpensesByMonth(): Promise<{ month: string, total: number }[]> {
-    const res = await fetch('/api/expenses/month', {
+export async function getExpensesByMonth(startDate?: string | null, endDate?: string | null): Promise<{ month: string, total: number }[]> {
+    const range = {
+        startDate: startDate ?? undefined,
+        endDate: endDate ?? undefined,
+    }
+    
+    const res = await fetch(`/api/expenses/month${buildQuery(range)}`, {
         method: 'GET',
         headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`

@@ -1,36 +1,51 @@
 import { Alert, Box, Center, Divider, Group, Loader, Paper, Text } from "@mantine/core";
 import BackButton from "../components/BackButton";
-import { useEffect, useState } from "react";
-import { getExpensesByCategory, getExpensesByMonth } from "../api/Expenses";
+import { useCallback, useEffect, useState } from "react";
 import { type MonthlyExpenses, type CategoryTotal } from "../types/Trends";
 import CategoryDonutChart from "../components/CategoryDonutChart";
 import ExpenseBarChart from "../components/ExpensesBarChart";
-import { IconAlertCircle } from "@tabler/icons-react";
+import { IconAlertCircle, IconCalendar } from "@tabler/icons-react";
+import { getExpensesByCategory, getExpensesByMonth } from "../api/Expenses";
+import { MonthPickerInput } from "@mantine/dates";
 
 export function TrendsPage() {
   const [byCategory, setByCategory] = useState<CategoryTotal[]>([]);
   const [byMonth, setByMonth] = useState<MonthlyExpenses[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchTrends = async () => {
-      try {
-        const [categoryTrend, monthlyTrend] = await Promise.all([
-          getExpensesByCategory(),
-          getExpensesByMonth()
-        ]);
-        setByCategory(categoryTrend);
-        setByMonth(monthlyTrend)
-
-      } catch (error) {
-        setError("Failed to load trends. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTrends();  
+  const fetchTrends = useCallback(async (start: string | null, end: string | null) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [categoryTrend, monthlyTrend] = await Promise.all([
+        getExpensesByCategory(start, end),
+        getExpensesByMonth(start, end),
+      ]);
+      setByCategory(categoryTrend);
+      setByMonth(monthlyTrend);
+    } catch (error) {
+      setError("Failed to load trends. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => { fetchTrends(null, null); }, [fetchTrends]);
+
+  function handleStartDate(val: string | null) {
+    setStartDate(val);
+    fetchTrends(val, endDate);
+  }
+
+  function handleEndDate(val: string | null) {
+    setEndDate(val);
+    fetchTrends(startDate, val);
+  }
+
+  const total = (byMonth.reduce((sum, month) => sum + Number(month.total), 0)).toFixed(2);
 
   return (
     <>
@@ -40,6 +55,28 @@ export function TrendsPage() {
         <Text c="dimmed" size="sm" ml="lg" ta="center">Welcome to your expense trends!</Text>
         <Text c="dimmed" size="sm" ml="lg" mb="lg" ta="center">Here you can view your spending patterns by 
           category as well as monthly expenditure trends.</Text>
+        <Group justify="center" mb="xl">
+          <Text c="dimmed" size="sm">From:</Text>
+          <MonthPickerInput
+            leftSection={<IconCalendar stroke={1.25}/>}
+            placeholder="From"
+            value={startDate}
+            onChange={handleStartDate}
+            maxDate={endDate ? new Date(endDate) : undefined}
+            clearable
+            w={200}
+          />
+          <Text c="dimmed" size="sm">to:</Text>
+          <MonthPickerInput
+            leftSection={<IconCalendar stroke={1.25} />}
+            placeholder="To"
+            value={endDate}
+            onChange={handleEndDate}
+            minDate={startDate ? new Date(startDate) : undefined}
+            clearable
+            w={200}
+          />
+        </Group>
       </Box>
 
       {loading && (
@@ -65,7 +102,7 @@ export function TrendsPage() {
             <ExpenseBarChart byMonth={byMonth} />
             <Divider />
             <Text size="sm" ta="center" mt="xs">
-              Total across all months: ${(byMonth.reduce((sum, month) => sum + Number(month.total), 0)).toFixed(2)}
+              Total across all months: ${total}
             </Text>
           </Paper>
         </Group>

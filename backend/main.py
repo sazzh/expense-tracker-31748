@@ -311,17 +311,27 @@ async def delete_user(user_id: int, transaction: AsyncSession) -> None:
 
 # Trend Routes
 @get('/expenses/category')
-async def get_expenses_by_category(transaction: AsyncSession) -> list[dict[str, str | int]]:
-    query = select(Expense.category, func.sum(Expense.amount).label("total")).group_by(Expense.category)
+async def get_expenses_by_category(transaction: AsyncSession, current_user: User, start_date: Optional[date] = None, end_date: Optional[date] = None) -> list[dict[str, str | int]]:
+    query = select(Expense.category, func.sum(Expense.amount).label("total")).where(Expense.user_id == current_user.id)
+    if start_date:
+        query = query.where(Expense.date >= start_date)
+    if end_date:
+        query = query.where(Expense.date <= end_date)
+    query = query.group_by(Expense.category)
     result = await transaction.execute(query)
     data = [{"category": row.category, "total": row.total} for row in result.all()]
     return data
 
 @get('/expenses/month')
-async def get_expenses_by_month(transaction: AsyncSession) -> list[dict[str, str | int]]:
+async def get_expenses_by_month(transaction: AsyncSession, current_user: User, start_date: Optional[date] = None, end_date: Optional[date] = None) -> list[dict[str, str | int]]:
     query = select(func.strftime("%Y-%m", Expense.date).label("month"),
                    func.sum(Expense.amount).label("total")
-                ).group_by("month").order_by("month")
+                ).where(Expense.user_id == current_user.id)
+    if start_date:
+        query = query.where(Expense.date >= start_date)
+    if end_date:
+        query = query.where(Expense.date <= end_date)
+    query = query.group_by("month").order_by("month")
     result = await transaction.execute(query)
     data = [{"month": row.month, "total": row.total} for row in result.all()]
     return data
